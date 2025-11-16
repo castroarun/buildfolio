@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode Colors */
+    --color-background: #FFFFFF;
+    --color-text-primary: #1F2937;
+    --color-text-secondary: #6B7280;
+    --color-text-muted: #9CA3AF;
+    --color-accent-blue: #3B82F6;
+    --color-accent-green: #10B981;
+    --color-accent-amber: #F59E0B;
+    --color-border: #E5E7EB;
+    --color-border-light: #F3F4F6;
+  }
+
+  .dark {
+    /* Dark Mode Colors */
+    --color-background: #1F2937;
+    --color-surface: #374151;
+    --color-text-primary: #F9FAFB;
+    --color-text-secondary: #D1D5DB;
+    --color-text-muted: #9CA3AF;
+    --color-border: #4B5563;
+  }
+
+  body {
+    @apply bg-background text-text-primary antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar styling */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-border-light;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-text-muted rounded-full;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-text-secondary;
+  }
+
+  /* Animation for Jira detection pulse */
+  @keyframes pulse-green {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-pulse-green {
+    animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}

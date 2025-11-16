@@ -1,0 +1,170 @@
+Test ID,Feature,Test Case,Test Steps,Expected Result,Priority,Status
+TC001,Authentication,User can login with Google,"1. Navigate to app homepage
+2. Click 'Sign in with Google' button
+3. Enter Google credentials
+4. Grant permissions",User is redirected to dashboard with logged-in state,High,Pending
+TC002,Authentication,User session persists,"1. Login with Google
+2. Close browser
+3. Reopen app","User remains logged in, no re-authentication needed",High,Pending
+TC003,Authentication,User can logout,"1. Click logout button
+2. Confirm logout","User is logged out, redirected to login page",Medium,Pending
+TC004,Notes,Create a new note,"1. Click 'New Note' button
+2. Enter title
+3. Enter content","New note is created, appears in note list",High,Pending
+TC005,Notes,Edit existing note,"1. Click on note from list
+2. Modify title or content
+3. Wait 2 seconds (auto-save)","Changes are saved automatically, UI shows save indicator",High,Pending
+TC006,Notes,Delete note (soft delete),"1. Click on note
+2. Click delete button
+3. Confirm deletion","Note is moved to trash, removed from main list",High,Pending
+TC007,Notes,Restore note from trash,"1. Navigate to trash
+2. Select deleted note
+3. Click restore button","Note is restored to main list with original content",Medium,Pending
+TC008,Notes,Permanent delete after 30 days,"1. Delete a note
+2. Wait 30 days (or simulate)","Note is permanently removed from database",Low,Pending
+TC009,Rich Text Editor,Format text as bold,"1. Open note editor
+2. Select text
+3. Click bold button (or Ctrl+B)","Selected text becomes bold",High,Pending
+TC010,Rich Text Editor,Format text as italic,"1. Select text
+2. Click italic button (or Ctrl+I)","Selected text becomes italic",High,Pending
+TC011,Rich Text Editor,Create heading,"1. Type text
+2. Select heading level from toolbar (H1-H6)","Text is formatted as heading with correct level",High,Pending
+TC012,Rich Text Editor,Create bullet list,"1. Click bullet list button
+2. Type list items","Bulleted list is created with proper formatting",High,Pending
+TC013,Rich Text Editor,Create numbered list,"1. Click numbered list button
+2. Type list items","Numbered list is created with proper formatting",High,Pending
+TC014,Rich Text Editor,Create code block,"1. Click code block button
+2. Type code","Code block is created with monospace font",Medium,Pending
+TC015,Rich Text Editor,Insert link,"1. Select text
+2. Click link button
+3. Enter URL","Text becomes clickable link",Medium,Pending
+TC016,Rich Text Editor,Auto-save triggers,"1. Start typing in note
+2. Wait 2 seconds without typing","Note is auto-saved, save indicator shows",High,Pending
+TC017,Jira Integration,Parse explicit keywords,"1. Create note with explicit keywords: TASK: DESC: AC: COMMENT:
+2. Click 'Create Jira Task' button","Task data is correctly parsed and displayed in preview",High,Pending
+TC018,Jira Integration,Parse smart detection,"1. Write note with: 'Fix authentication bug'
+2. Add: 'Users unable to login'
+3. Add: 'Must complete OAuth flow'
+4. Click 'Create Jira Task'","Task, description, and AC are correctly detected",High,Pending
+TC019,Jira Integration,Create Jira issue,"1. Parse note as Jira task
+2. Confirm task details
+3. Click 'Create Issue'","Jira issue is created, issue key is displayed (e.g., PROJ-123)",High,Pending
+TC020,Jira Integration,Update existing Jira issue,"1. Edit note linked to Jira issue
+2. Click 'Update Jira Task'","Jira issue is updated with new content",Medium,Pending
+TC021,Jira Integration,Configure Jira settings,"1. Go to Settings
+2. Enter Jira domain, email, API token
+3. Select default project and issue type
+4. Save configuration","Jira credentials are saved (encrypted), connection is verified",High,Pending
+TC022,Jira Integration,Link note to Jira issue,"1. Create Jira issue from note
+2. Check note details","Note shows Jira issue link, clicking opens Jira in new tab",Medium,Pending
+TC023,Gmail Integration,Configure Gmail settings,"1. Go to Settings
+2. Click 'Connect Gmail'
+3. Authorize OAuth permissions
+4. Grant access","Gmail is connected, access tokens are stored",High,Pending
+TC024,Gmail Integration,Email note content,"1. Open note
+2. Click 'Email' button
+3. Enter recipient email
+4. Click 'Send'","Email is sent with note content, success notification shown",High,Pending
+TC025,Gmail Integration,Email Jira task summary,"1. Create Jira task from note
+2. Click 'Email task summary'
+3. Enter recipient
+4. Send","Email contains task details and Jira link",Medium,Pending
+TC026,Gmail Integration,Attach note as .md file,"1. Open note
+2. Click 'Email' button
+3. Check 'Attach as markdown'
+4. Send","Email includes .md file attachment",Medium,Pending
+TC027,Gmail Integration,Use email template,"1. Open note
+2. Click 'Email' button
+3. Select template
+4. Verify variables are replaced ({{noteTitle}}, etc.)
+5. Send","Email uses template with correct variable substitution",Low,Pending
+TC028,Gmail Integration,Rate limiting,"1. Send 50 emails within an hour
+2. Attempt to send 51st email","Error message: 'Rate limit exceeded, try again later'",Medium,Pending
+TC029,Markdown Sync,Select local folder,"1. Click 'Sync with Folder'
+2. File picker opens
+3. Select folder
+4. Grant permissions","Folder is selected, permission granted",High,Pending
+TC030,Markdown Sync,Import .md files,"1. Select folder with .md files
+2. Click 'Import'","All .md files are imported as notes, YAML frontmatter parsed",High,Pending
+TC031,Markdown Sync,Sync local file to app,"1. Edit .md file in local folder
+2. Save file","App detects change, updates note in database",High,Pending
+TC032,Markdown Sync,Sync app note to file,"1. Edit note in app
+2. Wait for auto-save","Local .md file is updated with new content",High,Pending
+TC033,Markdown Sync,Conflict resolution,"1. Edit same note in app and local file simultaneously
+2. Save both","Last write wins, sync status shows conflict warning",Medium,Pending
+TC034,Markdown Sync,Sync status indicators,"1. Make changes to note
+2. Observe sync status icon","Icons change: ⟳ syncing → ✓ synced",Medium,Pending
+TC035,Markdown Sync,YAML frontmatter parsing,"1. Import .md file with YAML frontmatter (title, tags, date)
+2. Check note details","Metadata is correctly parsed into note fields",Medium,Pending
+TC036,Tags,Create new tag,"1. Open note
+2. Type '#' and tag name
+3. Press Enter","New tag is created and applied to note",High,Pending
+TC037,Tags,Apply multiple tags,"1. Add tag 'work'
+2. Add tag 'important'","Both tags appear on note, color-coded",High,Pending
+TC038,Tags,Filter notes by tag,"1. Click on tag in sidebar
+2. View filtered notes","Only notes with selected tag are shown",High,Pending
+TC039,Tags,Multi-select tag filter,"1. Select tag 'work'
+2. Hold Ctrl, select tag 'urgent'","Notes with either tag are shown",Medium,Pending
+TC040,Tags,Tag autocomplete,"1. Start typing tag name
+2. Observe suggestions","Existing tags appear as suggestions",Medium,Pending
+TC041,Tags,Delete tag,"1. Go to tag management
+2. Select tag
+3. Click delete","Tag is removed from all notes",Low,Pending
+TC042,Search,Search by title,"1. Enter 'authentication' in search bar
+2. Press Enter","Notes with 'authentication' in title are shown",High,Pending
+TC043,Search,Search by content,"1. Enter 'OAuth' in search bar
+2. Press Enter","Notes containing 'OAuth' in content are shown",High,Pending
+TC044,Search,Real-time search,"1. Start typing in search bar
+2. Observe results as you type","Results update in real-time with each keystroke",Medium,Pending
+TC045,Search,Highlight search terms,"1. Search for 'login'
+2. View results","'login' is highlighted in note previews",Low,Pending
+TC046,Search,Empty search results,"1. Search for non-existent term
+2. View results","'No notes found' message displayed",Low,Pending
+TC047,Sharing,Share note with view permission,"1. Click 'Share' on note
+2. Enter email address
+3. Select 'View' permission
+4. Click 'Send invitation'","Invitation email sent, recipient can view but not edit",High,Pending
+TC048,Sharing,Share note with edit permission,"1. Click 'Share' on note
+2. Enter email address
+3. Select 'Edit' permission
+4. Send invitation","Recipient can view and edit note",High,Pending
+TC049,Sharing,Access shared note,"1. Receive share invitation
+2. Click link in email
+3. Sign in with Google","Shared note is accessible with correct permissions",High,Pending
+TC050,Sharing,Real-time collaboration,"1. Open shared note (Edit permission)
+2. Two users edit simultaneously","Both users see changes in real-time, cursors visible",Medium,Pending
+TC051,Sharing,View collaborators list,"1. Open shared note
+2. Check collaborators section","All users with access are listed with permissions",Medium,Pending
+TC052,Sharing,Revoke access,"1. Open shared note (owner)
+2. Click on collaborator
+3. Click 'Revoke access'","User loses access, cannot view note anymore",Medium,Pending
+TC053,Sharing,Change permissions,"1. Open shared note (owner)
+2. Change collaborator from 'View' to 'Edit'
+3. Save changes","Collaborator can now edit note",Low,Pending
+TC054,UI/UX,Page loads in <2 seconds,"1. Open app on fresh browser
+2. Measure load time","Page fully loads in under 2 seconds",High,Pending
+TC055,UI/UX,Dark mode toggle,"1. Click dark mode toggle
+2. Observe UI changes","All UI elements switch to dark theme",Medium,Pending
+TC056,UI/UX,Responsive design - mobile,"1. Open app on mobile device (or resize browser)
+2. Test all features","UI adapts to mobile screen, all features work",High,Pending
+TC057,UI/UX,Keyboard shortcuts work,"1. Use Ctrl+B for bold
+2. Use Ctrl+S to save
+3. Use Ctrl+K for search","All keyboard shortcuts function correctly",Medium,Pending
+TC058,Security,Unauthorized access blocked,"1. Logout
+2. Try to access /notes URL directly","Redirected to login page",High,Pending
+TC059,Security,RLS prevents data access,"1. User A creates note
+2. User B attempts to access User A's note (direct API call)","Access denied, error returned",High,Pending
+TC060,Security,API tokens encrypted,"1. Configure Jira/Gmail
+2. Check database","API tokens are stored encrypted, not plain text",High,Pending
+TC061,Performance,Auto-save debouncing,"1. Type rapidly in note
+2. Observe save requests","Only 1 save request after 2 seconds of no typing",Medium,Pending
+TC062,Performance,Search performance on 1000+ notes,"1. Create 1000+ notes
+2. Perform search
+3. Measure response time","Search completes in <500ms",Medium,Pending
+TC063,Error Handling,Network error during save,"1. Disconnect internet
+2. Edit note
+3. Wait for auto-save","Error message shown, retry option available",Medium,Pending
+TC064,Error Handling,Jira API failure,"1. Enter invalid Jira credentials
+2. Attempt to create issue","Clear error message: 'Invalid credentials, check settings'",High,Pending
+TC065,Error Handling,Gmail OAuth revoked,"1. Revoke Gmail access from Google account
+2. Try to send email","Error: 'Gmail access revoked, please reconnect'",Medium,Pending
