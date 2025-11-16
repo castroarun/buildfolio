@@ -1,30 +1,13 @@
 /**
- * Supabase client configuration and database operations
+ * Supabase server client for server components and API routes
  *
- * Provides Supabase client instances for server and client components
- * and common database operations
+ * IMPORTANT: This file uses next/headers and can ONLY be imported by server components
+ * For client components, use lib/supabase-client.ts instead
  */
 
-import { createBrowserClient } from '@supabase/ssr'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Database } from '@/lib/database.types'
-
-/**
- * Create Supabase client for browser/client components
- *
- * Input: None
- * Output: Supabase client instance
- *
- * Called by: Client components, hooks
- * Calls: @supabase/ssr createBrowserClient
- */
-export function createClient() {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
 
 /**
  * Create Supabase client for server components
@@ -58,37 +41,4 @@ export async function createServerComponentClient() {
       },
     }
   )
-}
-
-// ============================================================================
-// Database Helper Functions
-// ============================================================================
-
-/**
- * Get current authenticated user
- *
- * Input: Supabase client instance
- * Output: User object or null
- *
- * Called by: All authenticated operations
- * Calls: supabase.auth.getUser
- */
-export async function getCurrentUser(supabase: ReturnType<typeof createClient>) {
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) return null
-  return user
-}
-
-/**
- * Check if user is authenticated
- *
- * Input: Supabase client instance
- * Output: Boolean
- *
- * Called by: Protected pages and components
- * Calls: getCurrentUser
- */
-export async function isAuthenticated(supabase: ReturnType<typeof createClient>) {
-  const user = await getCurrentUser(supabase)
-  return user !== null
 }

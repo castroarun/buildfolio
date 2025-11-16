@@ -15,7 +15,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { useEffect, useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase-client'
 import type { Note } from '@/types'
 import { JiraDetectionPanel } from './JiraDetectionPanel'
 
