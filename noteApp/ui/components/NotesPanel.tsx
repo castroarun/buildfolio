@@ -56,9 +56,17 @@ export function NotesPanel({ onSelectNote, currentNoteId, onClose }: NotesPanelP
    */
   const handleCreateNote = async () => {
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        console.error('No user found')
+        return
+      }
+
       const { data, error } = await supabase
         .from('notes')
         .insert({
+          user_id: user.id,
           title: 'Untitled',
           content: '',
           plain_text: '',
