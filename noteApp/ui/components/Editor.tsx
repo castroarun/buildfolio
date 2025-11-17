@@ -42,6 +42,21 @@ export function Editor({ noteId, userId }: EditorProps) {
     addKeyboardShortcuts() {
       return {
         'Mod-h': () => this.editor.commands.toggleHeading({ level: 2 }),
+        'Tab': () => {
+          // If in a list, sink (indent) the list item
+          if (this.editor.isActive('listItem')) {
+            return this.editor.commands.sinkListItem('listItem')
+          }
+          // Otherwise, create a bullet list
+          return this.editor.commands.toggleBulletList()
+        },
+        'Shift-Tab': () => {
+          // If in a list, lift (unindent) the list item
+          if (this.editor.isActive('listItem')) {
+            return this.editor.commands.liftListItem('listItem')
+          }
+          return false
+        },
       }
     },
   })
@@ -69,7 +84,7 @@ export function Editor({ noteId, userId }: EditorProps) {
     content: '',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none min-h-full p-8 font-light',
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none min-h-full p-8',
       },
     },
     onUpdate: ({ editor }) => {
