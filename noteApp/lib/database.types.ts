@@ -187,64 +187,6 @@ export interface Database {
           updated_at?: string
         }
       }
-      gmail_configs: {
-        Row: {
-          id: string
-          user_id: string
-          email: string
-          access_token_encrypted: string
-          refresh_token_encrypted: string
-          expires_at: number
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          email: string
-          access_token_encrypted: string
-          refresh_token_encrypted: string
-          expires_at: number
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          email?: string
-          access_token_encrypted?: string
-          refresh_token_encrypted?: string
-          expires_at?: number
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      email_templates: {
-        Row: {
-          id: string
-          user_id: string
-          name: string
-          subject: string
-          body: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-          subject: string
-          body: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          subject?: string
-          body?: string
-          created_at?: string
-        }
-      }
       sync_configs: {
         Row: {
           id: string
