@@ -14,7 +14,10 @@
       "Bash(taskkill:*)",
       "Bash(nul)",
       "Bash(cat:*)",
-      "Bash(timeout /t 3 /nobreak)"
+      "Bash(timeout /t 3 /nobreak)",
+      "Bash(del .nextdevlock 2)",
+      "Bash(dir:*)",
+      "Bash(del \"c:\\Users\\Castro\\Documents\\Projects\\noteApp\\nul\")"
     ],
     "deny": [],
     "ask": []

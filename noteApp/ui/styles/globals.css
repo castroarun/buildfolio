@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Override Tailwind's list reset for the editor */
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-left: 0.5em;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-left: 0.5em;
+}
+
+.ProseMirror li {
+  display: list-item;
+}
+
 @layer base {
   :root {
     /* Light Mode Colors */
@@ -40,6 +57,80 @@
 
   * {
     @apply border-border;
+  }
+}
+
+@layer components {
+  /* TipTap Editor Styles */
+  .ProseMirror {
+    outline: none;
+    min-height: 100%;
+  }
+
+  .ProseMirror ul,
+  .ProseMirror ol {
+    padding-left: 2rem !important;
+    margin: 0.5rem 0 !important;
+  }
+
+  .ProseMirror ul {
+    list-style-type: disc !important;
+    list-style-position: outside !important;
+  }
+
+  .ProseMirror ul ul {
+    list-style-type: circle !important;
+  }
+
+  .ProseMirror ul ul ul {
+    list-style-type: square !important;
+  }
+
+  .ProseMirror ol {
+    list-style-type: decimal !important;
+    list-style-position: outside !important;
+  }
+
+  .ProseMirror li {
+    display: list-item !important;
+    margin: 0.25rem 0;
+    padding-left: 0.25rem;
+  }
+
+  .ProseMirror li > p {
+    margin: 0;
+  }
+
+  /* Force bullet visibility */
+  .ProseMirror ul > li::before {
+    content: none;
+  }
+
+  .ProseMirror h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .ProseMirror h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .ProseMirror h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0.75rem 0 0.5rem;
+  }
+
+  .ProseMirror p {
+    margin: 0.5rem 0;
+  }
+
+  .ProseMirror a {
+    color: var(--color-accent-blue);
+    text-decoration: underline;
   }
 }
 

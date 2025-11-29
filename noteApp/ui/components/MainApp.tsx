@@ -10,12 +10,13 @@
  * Calls: Editor, NotesPanel, RightPanel, UserMenu
  */
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Editor } from './Editor'
 import { NotesPanel } from './NotesPanel'
 import { RightPanel } from './RightPanel'
 import { UserMenu } from './Auth'
 import { useTheme } from '@/ui/contexts/ThemeContext'
+import { createClient } from '@/lib/supabase-client'
 import type { PanelState } from '@/types'
 
 interface MainAppProps {
@@ -28,7 +29,36 @@ export function MainApp({ user }: MainAppProps) {
     right: true,
   })
   const [currentNoteId, setCurrentNoteId] = useState<string | null>(null)
+  const [notesPanelKey, setNotesPanelKey] = useState(0)
   const { theme, toggleTheme } = useTheme()
+  const supabase = createClient()
+
+  /**
+   * Create a new note with template content
+   */
+  const handleCreateFromTemplate = async (title: string, content: string, plainText: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .insert({
+          user_id: user.id,
+          title,
+          content,
+          plain_text: plainText,
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Select the new note
+      setCurrentNoteId(data.id)
+      // Refresh the notes panel
+      setNotesPanelKey(prev => prev + 1)
+    } catch (error) {
+      console.error('Error creating note from template:', error)
+    }
+  }
 
   /**
    * Toggle panel visibility
@@ -82,6 +112,7 @@ export function MainApp({ user }: MainAppProps) {
         {panels.left && (
           <div className="w-[280px] bg-border-light border-r border-border flex flex-col">
             <NotesPanel
+              key={notesPanelKey}
               onSelectNote={setCurrentNoteId}
               currentNoteId={currentNoteId}
               onClose={() => togglePanel('left')}
@@ -117,8 +148,8 @@ export function MainApp({ user }: MainAppProps) {
 
         </div>
 
-        {/* Right Panel - Utilities */}
-        <RightPanel />
+        {/* Right Panel - Templates */}
+        <RightPanel onCreateFromTemplate={handleCreateFromTemplate} />
       </main>
     </div>
   )

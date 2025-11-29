@@ -237,7 +237,7 @@ export function NotesPanel({ onSelectNote, currentNoteId, onClose }: NotesPanelP
                     )}
                   </div>
                   <div className={`text-xs truncate mt-1 ${
-                    currentNoteId === note.id ? 'text-white/70' : 'text-text-muted'
+                    currentNoteId === note.id ? 'text-white/80' : 'text-text-secondary'
                   }`}>
                     {note.plain_text && note.plain_text.trim() !== '' ? note.plain_text : (note.title !== 'Untitled' ? note.title : 'Empty note')}
                   </div>
