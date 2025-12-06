@@ -6,7 +6,7 @@ import { getProfiles } from '@/lib/storage/profiles'
 import { loadSampleData, hasSampleData, removeSampleData } from '@/lib/storage/seedData'
 import { ProfileCard, EmptyProfileSlot } from '@/components/profile'
 import { MotivationalQuote } from '@/components/quotes'
-import { ThemeToggle } from '@/components/ui'
+import { ThemeToggle, UnitToggle } from '@/components/ui'
 
 export default function HomePage() {
   const [profiles, setProfiles] = useState<Profile[]>([])
@@ -52,7 +52,10 @@ export default function HomePage() {
               {profiles.length} of {VALIDATION.maxProfiles} profiles
             </p>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <UnitToggle />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

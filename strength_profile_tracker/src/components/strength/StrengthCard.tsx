@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Level, LEVEL_COLORS, LEVEL_NAMES, BODY_PART_NAMES, CalculatedStrength } from '@/types'
 import { Card } from '@/components/ui'
+import { useUnit } from '@/contexts'
+import { formatWeightValue } from '@/lib/utils/units'
 import WorkoutLogger from './WorkoutLogger'
 
 interface StrengthCardProps {
@@ -14,6 +16,7 @@ interface StrengthCardProps {
 
 export default function StrengthCard({ strength, onLevelSelect, showBodyPart = false, profileId }: StrengthCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const { unit } = useUnit()
   const isRated = strength.levels.some(l => l.isSelected)
 
   return (
@@ -99,9 +102,9 @@ export default function StrengthCard({ strength, onLevelSelect, showBodyPart = f
               className="text-lg font-bold"
               style={{ color: LEVEL_COLORS[level] }}
             >
-              {weight}
+              {formatWeightValue(weight, unit)}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">kg</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{unit}</span>
 
             {/* Level label */}
             <span

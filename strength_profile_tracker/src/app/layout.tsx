@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { ThemeProvider } from '@/contexts'
+import { ThemeProvider, UnitProvider } from '@/contexts'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -22,7 +22,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="bg-gray-50 dark:bg-gray-900 min-h-screen antialiased transition-colors">
         <ThemeProvider>
-          {children}
+          <UnitProvider>
+            {children}
+          </UnitProvider>
         </ThemeProvider>
       </body>
     </html>

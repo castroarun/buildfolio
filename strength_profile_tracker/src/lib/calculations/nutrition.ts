@@ -171,3 +171,23 @@ export function isBelowMinimum(targetCalories: number, sex: Sex): boolean {
 export function formatCalories(calories: number): string {
   return calories.toLocaleString()
 }
+
+/**
+ * Target BMI for healthy weight (middle of normal range 18.5-24.9)
+ */
+export const TARGET_BMI = 22
+
+/**
+ * Check if current BMI is close enough to target (within tolerance)
+ */
+export function isNearTargetBMI(currentBMI: number, tolerance: number = 0.5): boolean {
+  return Math.abs(currentBMI - TARGET_BMI) <= tolerance
+}
+
+/**
+ * Calculate target weight based on target BMI
+ */
+export function calculateTargetWeight(height: number, targetBMI: number = TARGET_BMI): number {
+  const heightInMeters = height / 100
+  return Math.round(targetBMI * (heightInMeters * heightInMeters))
+}

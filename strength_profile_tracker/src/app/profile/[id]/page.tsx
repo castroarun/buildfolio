@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Profile, Exercise, Level, BodyPart, SEX_INFO, ACTIVITY_LEVEL_INFO, GOAL_INFO } from '@/types'
+import { Profile, Exercise, Level, BodyPart, SEX_INFO, GOAL_INFO } from '@/types'
 import { getProfileById, updateExerciseRating, deleteProfile } from '@/lib/storage/profiles'
 import {
   getRatedExercises,
@@ -15,8 +15,10 @@ import {
   getRatedCount,
   getTotalExercisesCount
 } from '@/lib/calculations/strength'
-import { getNutritionInfo, BMI_CATEGORIES, formatCalories, isBelowMinimum } from '@/lib/calculations/nutrition'
-import { Button, ThemeToggle } from '@/components/ui'
+import { getNutritionInfo, BMI_CATEGORIES, formatCalories, isBelowMinimum, TARGET_BMI, isNearTargetBMI, calculateTargetWeight } from '@/lib/calculations/nutrition'
+import { formatWeightValue } from '@/lib/utils/units'
+import { useUnit } from '@/contexts'
+import { Button, ThemeToggle, UnitToggle } from '@/components/ui'
 import { StrengthCard, LevelLegend, BodyPartFilter, OverallLevel, StrengthScore, Badges, CoachTips } from '@/components/strength'
 
 interface ProfileDetailPageProps {
@@ -26,6 +28,7 @@ interface ProfileDetailPageProps {
 export default function ProfileDetailPage({ params }: ProfileDetailPageProps) {
   const { id } = use(params)
   const router = useRouter()
+  const { unit } = useUnit()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -107,7 +110,10 @@ export default function ProfileDetailPage({ params }: ProfileDetailPageProps) {
             </Link>
             <h1 className="text-lg font-semibold">{profile.name}</h1>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <UnitToggle />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -153,8 +159,8 @@ export default function ProfileDetailPage({ params }: ProfileDetailPageProps) {
                   <span className="text-xs">cm</span>
                 </div>
                 <div>
-                  <span className="block font-medium text-[#2C3E50] dark:text-gray-200">{profile.weight}</span>
-                  <span className="text-xs">kg</span>
+                  <span className="block font-medium text-[#2C3E50] dark:text-gray-200">{formatWeightValue(profile.weight, unit)}</span>
+                  <span className="text-xs">{unit}</span>
                 </div>
               </div>
             </div>
@@ -259,6 +265,11 @@ export default function ProfileDetailPage({ params }: ProfileDetailPageProps) {
                       <span className="font-semibold text-gray-800 dark:text-gray-100">
                         {nutritionInfo.bmi}
                       </span>
+                      {!isNearTargetBMI(nutritionInfo.bmi) && (
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                          → {TARGET_BMI}
+                        </span>
+                      )}
                       <span
                         className="text-xs px-2 py-0.5 rounded-full"
                         style={{ backgroundColor: `${bmiInfo.color}20`, color: bmiInfo.color }}
@@ -267,12 +278,51 @@ export default function ProfileDetailPage({ params }: ProfileDetailPageProps) {
                       </span>
                     </div>
                   </div>
+                  {/* BMI bar with target indicator */}
+                  {!isNearTargetBMI(nutritionInfo.bmi) && (
+                    <div className="mt-2 relative">
+                      <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                        {/* Current BMI position - scale: 15 to 35 BMI range */}
+                        <div
+                          className="absolute h-1.5 rounded-full transition-all"
+                          style={{
+                            backgroundColor: bmiInfo.color,
+                            width: '4px',
+                            left: `${Math.min(100, Math.max(0, ((nutritionInfo.bmi - 15) / 20) * 100))}%`,
+                            transform: 'translateX(-50%)'
+                          }}
+                        />
+                        {/* Target BMI marker */}
+                        <div
+                          className="absolute h-1.5 rounded-full bg-green-400/50 dark:bg-green-500/50"
+                          style={{
+                            width: '4px',
+                            left: `${((TARGET_BMI - 15) / 20) * 100}%`,
+                            transform: 'translateX(-50%)'
+                          }}
+                        />
+                        {/* Healthy range background (18.5-24.9) */}
+                        <div
+                          className="absolute h-1.5 bg-green-200/30 dark:bg-green-500/20"
+                          style={{
+                            left: `${((18.5 - 15) / 20) * 100}%`,
+                            width: `${((24.9 - 18.5) / 20) * 100}%`
+                          }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+                        <span>15</span>
+                        <span className="text-green-500">Target: {TARGET_BMI}</span>
+                        <span>35</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Weekly projection */}
                 {nutritionInfo.weeklyChange !== 0 && (
                   <div className="text-xs text-center text-gray-500 dark:text-gray-400 pt-1">
-                    {nutritionInfo.weeklyChange > 0 ? '↑' : '↓'} ~{Math.abs(nutritionInfo.weeklyChange)} kg/week
+                    {nutritionInfo.weeklyChange > 0 ? '↑' : '↓'} ~{formatWeightValue(Math.abs(nutritionInfo.weeklyChange), unit)} {unit}/week
                   </div>
                 )}
 

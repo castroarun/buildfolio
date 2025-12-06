@@ -221,3 +221,15 @@ export const ALL_ACTIVITY_LEVELS: ActivityLevel[] = ['sedentary', 'light', 'mode
 
 // All goals
 export const ALL_GOALS: Goal[] = ['lose', 'maintain', 'gain']
+
+// Unit types for weight display
+export type WeightUnit = 'kg' | 'lbs'
+
+export const WEIGHT_UNIT_INFO: Record<WeightUnit, { name: string; shortName: string }> = {
+  kg: { name: 'Kilograms', shortName: 'kg' },
+  lbs: { name: 'Pounds', shortName: 'lbs' }
+} as const
+
+// Conversion constants
+export const KG_TO_LBS = 2.20462
+export const LBS_TO_KG = 0.453592
