@@ -6,92 +6,67 @@
   <title>Muscle Anatomy</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f5;
-      min-height: 100vh;
-    }
-    .header {
-      background: white;
-      padding: 16px;
-      border-bottom: 1px solid #e0e0e0;
-      text-align: center;
-    }
-    .header h1 { font-size: 18px; font-weight: 600; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; min-height: 100vh; }
+    .header { background: #fff; padding: 16px; border-bottom: 1px solid #eee; text-align: center; }
+    .header h1 { font-size: 18px; font-weight: 600; color: #333; }
+    .container { max-width: 700px; margin: 0 auto; padding: 20px; }
 
-    .body-images {
+    .body-wrapper {
       display: flex;
       justify-content: center;
-      gap: 20px;
+      gap: 10px;
       margin: 20px 0;
     }
+
     .body-view {
       position: relative;
       text-align: center;
     }
+
     .body-view img {
-      width: 200px;
+      width: 220px;
       height: auto;
+      display: block;
     }
+
     .view-label {
-      font-size: 12px;
-      color: #666;
+      font-size: 11px;
+      color: #999;
       margin-top: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
-    /* Clickable muscle overlays */
-    .muscle-overlay {
+    /* Clickable overlay areas positioned over the image */
+    .overlay {
       position: absolute;
       cursor: pointer;
       border-radius: 4px;
-      transition: background 0.2s;
+      transition: background 0.15s;
     }
-    .muscle-overlay:hover {
-      background: rgba(232, 90, 107, 0.3);
-    }
-    .muscle-overlay.selected {
-      background: rgba(232, 90, 107, 0.6);
-    }
+    .overlay:hover { background: rgba(232, 90, 107, 0.25); }
+    .overlay.selected { background: rgba(232, 90, 107, 0.45); }
 
-    .instructions {
-      text-align: center;
-      color: #666;
-      font-size: 13px;
-      margin: 16px 0;
-    }
+    .instructions { text-align: center; color: #888; font-size: 13px; margin: 16px 0; }
 
     .info-panel {
-      background: white;
+      background: #fafafa;
+      border: 1px solid #eee;
       border-radius: 12px;
       padding: 20px;
       margin-top: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: none;
     }
     .info-panel.visible { display: block; }
-    .info-panel h2 { color: #e85a6b; font-size: 18px; margin-bottom: 4px; }
-    .info-panel .latin { color: #666; font-size: 13px; font-style: italic; margin-bottom: 16px; }
-    .section-title { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
-    .parts { display: flex; flex-wrap: wrap; gap: 6px; }
-    .part { padding: 6px 12px; background: #f5f5f5; border-radius: 16px; font-size: 12px; }
-    .exercise { display: flex; align-items: center; gap: 12px; padding: 12px; background: #f9f9f9; border-radius: 8px; margin-bottom: 8px; }
-    .exercise-icon { width: 36px; height: 36px; background: #e85a6b; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; }
-    .exercise-name { font-weight: 500; font-size: 14px; }
-    .exercise-target { color: #666; font-size: 12px; }
-
-    /* Using embedded SVG for the body outline - clean professional style */
-    .anatomy-svg {
-      width: 180px;
-      height: 380px;
-    }
-    .body-fill { fill: #fafafa; stroke: #ccc; stroke-width: 1; }
-    .muscle-region { fill: transparent; stroke: none; cursor: pointer; transition: fill 0.2s; }
-    .muscle-region:hover { fill: rgba(232, 90, 107, 0.25); }
-    .muscle-region.selected { fill: rgba(232, 90, 107, 0.5); }
-    .muscle-line { fill: none; stroke: #ddd; stroke-width: 0.8; }
+    .info-panel h2 { color: #e85a6b; font-size: 18px; margin-bottom: 2px; }
+    .info-panel .latin { color: #888; font-size: 12px; font-style: italic; margin-bottom: 14px; }
+    .section-title { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 6px; }
+    .parts { display: flex; flex-wrap: wrap; gap: 5px; }
+    .part { padding: 5px 10px; background: #fff; border: 1px solid #e0e0e0; border-radius: 14px; font-size: 11px; }
+    .exercise { display: flex; align-items: center; gap: 10px; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; margin-bottom: 6px; }
+    .exercise-icon { width: 32px; height: 32px; background: #e85a6b; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
+    .exercise-name { font-weight: 500; font-size: 13px; }
+    .exercise-target { color: #888; font-size: 11px; }
   </style>
 </head>
 <body>
@@ -100,101 +75,36 @@
   </header>
 
   <div class="container">
-    <div class="body-images">
-      <!-- Front View - Using embedded professional body outline -->
-      <div class="body-view">
-        <svg class="anatomy-svg" viewBox="0 0 100 220">
-          <!-- Simple professional body silhouette - Front -->
-          <g class="front-body">
-            <!-- Head -->
-            <ellipse class="body-fill" cx="50" cy="16" rx="12" ry="14"/>
-            <!-- Neck -->
-            <rect class="body-fill" x="44" y="28" width="12" height="8"/>
-            <!-- Torso -->
-            <path class="body-fill" d="M30 36 Q20 40 18 55 L18 100 Q20 115 30 120 L35 135 Q38 145 42 150 L42 155 L58 155 L58 150 Q62 145 65 135 L70 120 Q80 115 82 100 L82 55 Q80 40 70 36 Z"/>
-            <!-- Left Arm -->
-            <path class="body-fill" d="M18 40 Q10 45 8 60 L6 90 Q5 110 8 125 L10 140 L18 140 L20 125 Q22 110 22 90 L22 60 Q22 50 20 45 Z"/>
-            <!-- Right Arm -->
-            <path class="body-fill" d="M82 40 Q90 45 92 60 L94 90 Q95 110 92 125 L90 140 L82 140 L80 125 Q78 110 78 90 L78 60 Q78 50 80 45 Z"/>
-            <!-- Left Leg -->
-            <path class="body-fill" d="M42 155 L38 180 Q36 200 35 220 L48 220 L48 200 Q48 180 50 165 Z"/>
-            <!-- Right Leg -->
-            <path class="body-fill" d="M58 155 L62 180 Q64 200 65 220 L52 220 L52 200 Q52 180 50 165 Z"/>
+    <div class="body-wrapper">
+      <!-- Front View -->
+      <div class="body-view" id="frontView">
+        <!-- Using public domain anatomy image from Wikimedia Commons -->
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Muscles_anterior_labeled.png/250px-Muscles_anterior_labeled.png" alt="Front muscles" crossorigin="anonymous">
 
-            <!-- Muscle definition lines -->
-            <path class="muscle-line" d="M35 45 Q50 55 65 45"/>
-            <path class="muscle-line" d="M50 36 L50 55"/>
-            <path class="muscle-line" d="M42 60 L42 115"/>
-            <path class="muscle-line" d="M58 60 L58 115"/>
-            <path class="muscle-line" d="M42 75 Q50 78 58 75"/>
-            <path class="muscle-line" d="M42 90 Q50 93 58 90"/>
-            <path class="muscle-line" d="M42 105 Q50 108 58 105"/>
-            <path class="muscle-line" d="M32 60 Q28 85 32 110"/>
-            <path class="muscle-line" d="M68 60 Q72 85 68 110"/>
-            <path class="muscle-line" d="M40 160 L38 190"/>
-            <path class="muscle-line" d="M48 160 L48 190"/>
-            <path class="muscle-line" d="M60 160 L62 190"/>
-            <path class="muscle-line" d="M52 160 L52 190"/>
-          </g>
+        <!-- Overlay clickable areas (percentages relative to image) -->
+        <div class="overlay" data-muscle="shoulders" style="top:12%; left:5%; width:18%; height:10%;"></div>
+        <div class="overlay" data-muscle="shoulders" style="top:12%; right:5%; width:18%; height:10%;"></div>
+        <div class="overlay" data-muscle="chest" style="top:15%; left:28%; width:44%; height:12%;"></div>
+        <div class="overlay" data-muscle="arms" style="top:15%; left:2%; width:20%; height:25%;"></div>
+        <div class="overlay" data-muscle="arms" style="top:15%; right:2%; width:20%; height:25%;"></div>
+        <div class="overlay" data-muscle="core" style="top:28%; left:32%; width:36%; height:18%;"></div>
+        <div class="overlay" data-muscle="legs" style="top:48%; left:22%; width:56%; height:35%;"></div>
 
-          <!-- Clickable regions - Front -->
-          <rect class="muscle-region" data-muscle="chest" x="30" y="40" width="40" height="25"/>
-          <rect class="muscle-region" data-muscle="shoulders" x="14" y="36" width="18" height="20"/>
-          <rect class="muscle-region" data-muscle="shoulders" x="68" y="36" width="18" height="20"/>
-          <rect class="muscle-region" data-muscle="arms" x="6" y="56" width="18" height="45"/>
-          <rect class="muscle-region" data-muscle="arms" x="76" y="56" width="18" height="45"/>
-          <rect class="muscle-region" data-muscle="arms" x="6" y="100" width="14" height="40"/>
-          <rect class="muscle-region" data-muscle="arms" x="80" y="100" width="14" height="40"/>
-          <rect class="muscle-region" data-muscle="core" x="38" y="65" width="24" height="55"/>
-          <rect class="muscle-region" data-muscle="legs" x="35" y="155" width="30" height="65"/>
-        </svg>
         <div class="view-label">Front</div>
       </div>
 
       <!-- Back View -->
-      <div class="body-view">
-        <svg class="anatomy-svg" viewBox="0 0 100 220">
-          <!-- Simple professional body silhouette - Back -->
-          <g class="back-body">
-            <!-- Head -->
-            <ellipse class="body-fill" cx="50" cy="16" rx="12" ry="14"/>
-            <!-- Neck -->
-            <rect class="body-fill" x="44" y="28" width="12" height="8"/>
-            <!-- Torso -->
-            <path class="body-fill" d="M30 36 Q20 40 18 55 L18 100 Q20 115 30 120 L35 135 Q38 145 42 150 L42 155 L58 155 L58 150 Q62 145 65 135 L70 120 Q80 115 82 100 L82 55 Q80 40 70 36 Z"/>
-            <!-- Left Arm -->
-            <path class="body-fill" d="M18 40 Q10 45 8 60 L6 90 Q5 110 8 125 L10 140 L18 140 L20 125 Q22 110 22 90 L22 60 Q22 50 20 45 Z"/>
-            <!-- Right Arm -->
-            <path class="body-fill" d="M82 40 Q90 45 92 60 L94 90 Q95 110 92 125 L90 140 L82 140 L80 125 Q78 110 78 90 L78 60 Q78 50 80 45 Z"/>
-            <!-- Left Leg -->
-            <path class="body-fill" d="M42 155 L38 180 Q36 200 35 220 L48 220 L48 200 Q48 180 50 165 Z"/>
-            <!-- Right Leg -->
-            <path class="body-fill" d="M58 155 L62 180 Q64 200 65 220 L52 220 L52 200 Q52 180 50 165 Z"/>
+      <div class="body-view" id="backView">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Muscles_posterior_labeled.png/250px-Muscles_posterior_labeled.png" alt="Back muscles" crossorigin="anonymous">
 
-            <!-- Back muscle lines -->
-            <path class="muscle-line" d="M35 36 Q50 50 65 36"/>
-            <path class="muscle-line" d="M50 36 L50 120"/>
-            <path class="muscle-line" d="M32 50 Q28 75 35 100"/>
-            <path class="muscle-line" d="M68 50 Q72 75 65 100"/>
-            <path class="muscle-line" d="M40 55 Q38 80 42 105"/>
-            <path class="muscle-line" d="M60 55 Q62 80 58 105"/>
-            <path class="muscle-line" d="M42 120 Q50 135 58 120"/>
-            <path class="muscle-line" d="M40 160 L38 200"/>
-            <path class="muscle-line" d="M48 160 L46 200"/>
-            <path class="muscle-line" d="M60 160 L62 200"/>
-            <path class="muscle-line" d="M52 160 L54 200"/>
-          </g>
+        <div class="overlay" data-muscle="back" style="top:10%; left:22%; width:56%; height:12%;"></div>
+        <div class="overlay" data-muscle="shoulders" style="top:12%; left:5%; width:18%; height:10%;"></div>
+        <div class="overlay" data-muscle="shoulders" style="top:12%; right:5%; width:18%; height:10%;"></div>
+        <div class="overlay" data-muscle="back" style="top:22%; left:25%; width:50%; height:22%;"></div>
+        <div class="overlay" data-muscle="arms" style="top:15%; left:2%; width:20%; height:25%;"></div>
+        <div class="overlay" data-muscle="arms" style="top:15%; right:2%; width:20%; height:25%;"></div>
+        <div class="overlay" data-muscle="legs" style="top:45%; left:22%; width:56%; height:38%;"></div>
 
-          <!-- Clickable regions - Back -->
-          <path class="muscle-region" data-muscle="back" d="M32 36 Q50 55 68 36 L68 50 Q50 65 32 50 Z"/>
-          <rect class="muscle-region" data-muscle="back" x="28" y="50" width="44" height="70"/>
-          <rect class="muscle-region" data-muscle="shoulders" x="14" y="36" width="18" height="20"/>
-          <rect class="muscle-region" data-muscle="shoulders" x="68" y="36" width="18" height="20"/>
-          <rect class="muscle-region" data-muscle="arms" x="6" y="56" width="18" height="45"/>
-          <rect class="muscle-region" data-muscle="arms" x="76" y="56" width="18" height="45"/>
-          <rect class="muscle-region" data-muscle="legs" x="35" y="120" width="30" height="40"/>
-          <rect class="muscle-region" data-muscle="legs" x="35" y="160" width="30" height="60"/>
-        </svg>
         <div class="view-label">Back</div>
       </div>
     </div>
@@ -204,10 +114,8 @@
     <div class="info-panel" id="infoPanel">
       <h2 id="muscleName">Chest</h2>
       <p class="latin" id="latinName">Pectoralis Major</p>
-
       <div class="section-title">Muscle Heads</div>
       <div class="parts" id="partsList"></div>
-
       <div class="section-title">Best Exercises</div>
       <div id="exercisesList"></div>
     </div>
@@ -223,13 +131,12 @@
       legs: { name: 'Legs', latin: 'Quadriceps, Hamstrings & Glutes', parts: ['Quadriceps (4 heads)', 'Hamstrings (3 muscles)', 'Glutes', 'Calves'], exercises: [{n:'Squat',t:'Quads & Glutes',i:'🏋️'},{n:'Romanian Deadlift',t:'Hamstrings',i:'🔻'},{n:'Hip Thrust',t:'Glutes',i:'🍑'}] }
     };
 
-    document.querySelectorAll('.muscle-region').forEach(el => {
+    document.querySelectorAll('.overlay').forEach(el => {
       el.addEventListener('click', e => {
         e.stopPropagation();
         const muscle = el.dataset.muscle;
-        document.querySelectorAll('.muscle-region.selected').forEach(m => m.classList.remove('selected'));
+        document.querySelectorAll('.overlay.selected').forEach(m => m.classList.remove('selected'));
         document.querySelectorAll(`[data-muscle="${muscle}"]`).forEach(m => m.classList.add('selected'));
-
         const d = data[muscle];
         document.getElementById('muscleName').textContent = d.name;
         document.getElementById('latinName').textContent = d.latin;
@@ -240,8 +147,8 @@
     });
 
     document.addEventListener('click', e => {
-      if (!e.target.closest('.muscle-region') && !e.target.closest('.info-panel')) {
-        document.querySelectorAll('.muscle-region.selected').forEach(m => m.classList.remove('selected'));
+      if (!e.target.closest('.overlay') && !e.target.closest('.info-panel')) {
+        document.querySelectorAll('.overlay.selected').forEach(m => m.classList.remove('selected'));
         document.getElementById('infoPanel').classList.remove('visible');
       }
     });
