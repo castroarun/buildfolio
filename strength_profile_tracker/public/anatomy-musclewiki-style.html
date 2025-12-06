@@ -10,53 +10,34 @@
     .header { background: #fff; padding: 16px; border-bottom: 1px solid #eee; text-align: center; }
     .header h1 { font-size: 18px; font-weight: 600; color: #333; }
     .container { max-width: 700px; margin: 0 auto; padding: 20px; }
+    .body-wrapper { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+    .body-view { position: relative; text-align: center; }
+    .view-label { font-size: 11px; color: #999; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .anatomy-container { position: relative; width: 180px; height: 380px; }
 
-    .body-wrapper {
+    /* Placeholder styling - replace with actual images */
+    .body-placeholder {
+      width: 100%;
+      height: 100%;
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
       display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin: 20px 0;
-    }
-
-    .body-view {
-      position: relative;
-      text-align: center;
-    }
-
-    .body-view img {
-      width: 220px;
-      height: auto;
-      display: block;
-    }
-
-    .view-label {
-      font-size: 11px;
       color: #999;
-      margin-top: 8px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      font-size: 12px;
     }
+    .body-placeholder svg { width: 120px; height: 280px; margin-bottom: 8px; }
+    .body-placeholder .body-shape { fill: #f0f0f0; stroke: #ccc; stroke-width: 1; }
+    .body-placeholder .muscle-lines { fill: none; stroke: #ddd; stroke-width: 0.5; }
 
-    /* Clickable overlay areas positioned over the image */
-    .overlay {
-      position: absolute;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background 0.15s;
-    }
-    .overlay:hover { background: rgba(232, 90, 107, 0.25); }
-    .overlay.selected { background: rgba(232, 90, 107, 0.45); }
-
+    .overlay { position: absolute; cursor: pointer; border-radius: 4px; transition: background 0.15s; }
+    .overlay:hover { background: rgba(232, 90, 107, 0.3); }
+    .overlay.selected { background: rgba(232, 90, 107, 0.5); }
     .instructions { text-align: center; color: #888; font-size: 13px; margin: 16px 0; }
-
-    .info-panel {
-      background: #fafafa;
-      border: 1px solid #eee;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
-      display: none;
-    }
+    .info-panel { background: #fafafa; border: 1px solid #eee; border-radius: 12px; padding: 20px; margin-top: 20px; display: none; }
     .info-panel.visible { display: block; }
     .info-panel h2 { color: #e85a6b; font-size: 18px; margin-bottom: 2px; }
     .info-panel .latin { color: #888; font-size: 12px; font-style: italic; margin-bottom: 14px; }
@@ -67,44 +48,82 @@
     .exercise-icon { width: 32px; height: 32px; background: #e85a6b; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
     .exercise-name { font-weight: 500; font-size: 13px; }
     .exercise-target { color: #888; font-size: 11px; }
+    .note { background: #fffbe6; border: 1px solid #ffe58f; padding: 12px; border-radius: 8px; font-size: 12px; color: #8c6d00; margin-bottom: 20px; }
   </style>
 </head>
 <body>
-  <header class="header">
-    <h1>Muscle Anatomy</h1>
-  </header>
-
+  <header class="header"><h1>Muscle Anatomy</h1></header>
   <div class="container">
+    <div class="note">
+      <strong>Setup:</strong> Add your anatomy images to <code>/public/</code> folder as <code>anatomy-front.png</code> and <code>anatomy-back.png</code>, then update the img src below.
+    </div>
+
     <div class="body-wrapper">
       <!-- Front View -->
-      <div class="body-view" id="frontView">
-        <!-- Using public domain anatomy image from Wikimedia Commons -->
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Muscles_anterior_labeled.png/250px-Muscles_anterior_labeled.png" alt="Front muscles" crossorigin="anonymous">
-
-        <!-- Overlay clickable areas (percentages relative to image) -->
-        <div class="overlay" data-muscle="shoulders" style="top:12%; left:5%; width:18%; height:10%;"></div>
-        <div class="overlay" data-muscle="shoulders" style="top:12%; right:5%; width:18%; height:10%;"></div>
-        <div class="overlay" data-muscle="chest" style="top:15%; left:28%; width:44%; height:12%;"></div>
-        <div class="overlay" data-muscle="arms" style="top:15%; left:2%; width:20%; height:25%;"></div>
-        <div class="overlay" data-muscle="arms" style="top:15%; right:2%; width:20%; height:25%;"></div>
-        <div class="overlay" data-muscle="core" style="top:28%; left:32%; width:36%; height:18%;"></div>
-        <div class="overlay" data-muscle="legs" style="top:48%; left:22%; width:56%; height:35%;"></div>
-
+      <div class="body-view">
+        <div class="anatomy-container" id="frontView">
+          <div class="body-placeholder">
+            <svg viewBox="0 0 100 240">
+              <path class="body-shape" d="M50 10 C40 10 35 18 35 25 C35 32 40 40 50 40 C60 40 65 32 65 25 C65 18 60 10 50 10 Z"/>
+              <rect class="body-shape" x="44" y="38" width="12" height="8"/>
+              <path class="body-shape" d="M30 46 Q18 50 16 65 L16 110 Q18 125 28 130 L32 145 Q36 155 40 160 L40 165 L60 165 L60 160 Q64 155 68 145 L72 130 Q82 125 84 110 L84 65 Q82 50 70 46 Z"/>
+              <path class="body-shape" d="M16 52 Q8 56 6 70 L5 100 Q5 120 8 135 L10 150 L18 150 L18 135 Q19 120 19 100 L19 70 Q18 58 18 54 Z"/>
+              <path class="body-shape" d="M84 52 Q92 56 94 70 L95 100 Q95 120 92 135 L90 150 L82 150 L82 135 Q81 120 81 100 L81 70 Q82 58 82 54 Z"/>
+              <path class="body-shape" d="M40 165 L36 195 Q34 215 33 235 L45 235 L47 215 Q48 195 50 175 Z"/>
+              <path class="body-shape" d="M60 165 L64 195 Q66 215 67 235 L55 235 L53 215 Q52 195 50 175 Z"/>
+              <g class="muscle-lines">
+                <path d="M35 55 Q50 65 65 55"/>
+                <line x1="50" y1="46" x2="50" y2="65"/>
+                <line x1="42" y1="70" x2="42" y2="125"/>
+                <line x1="58" y1="70" x2="58" y2="125"/>
+                <path d="M42 85 Q50 88 58 85"/>
+                <path d="M42 100 Q50 103 58 100"/>
+                <path d="M42 115 Q50 118 58 115"/>
+              </g>
+            </svg>
+            <span>Front View</span>
+          </div>
+          <div class="overlay" data-muscle="shoulders" style="top:12%; left:2%; width:24%; height:8%;"></div>
+          <div class="overlay" data-muscle="shoulders" style="top:12%; right:2%; width:24%; height:8%;"></div>
+          <div class="overlay" data-muscle="chest" style="top:16%; left:22%; width:56%; height:10%;"></div>
+          <div class="overlay" data-muscle="arms" style="top:14%; left:0%; width:20%; height:22%;"></div>
+          <div class="overlay" data-muscle="arms" style="top:14%; right:0%; width:20%; height:22%;"></div>
+          <div class="overlay" data-muscle="core" style="top:26%; left:28%; width:44%; height:20%;"></div>
+          <div class="overlay" data-muscle="legs" style="top:48%; left:20%; width:60%; height:38%;"></div>
+        </div>
         <div class="view-label">Front</div>
       </div>
 
       <!-- Back View -->
-      <div class="body-view" id="backView">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Muscles_posterior_labeled.png/250px-Muscles_posterior_labeled.png" alt="Back muscles" crossorigin="anonymous">
-
-        <div class="overlay" data-muscle="back" style="top:10%; left:22%; width:56%; height:12%;"></div>
-        <div class="overlay" data-muscle="shoulders" style="top:12%; left:5%; width:18%; height:10%;"></div>
-        <div class="overlay" data-muscle="shoulders" style="top:12%; right:5%; width:18%; height:10%;"></div>
-        <div class="overlay" data-muscle="back" style="top:22%; left:25%; width:50%; height:22%;"></div>
-        <div class="overlay" data-muscle="arms" style="top:15%; left:2%; width:20%; height:25%;"></div>
-        <div class="overlay" data-muscle="arms" style="top:15%; right:2%; width:20%; height:25%;"></div>
-        <div class="overlay" data-muscle="legs" style="top:45%; left:22%; width:56%; height:38%;"></div>
-
+      <div class="body-view">
+        <div class="anatomy-container" id="backView">
+          <div class="body-placeholder">
+            <svg viewBox="0 0 100 240">
+              <path class="body-shape" d="M50 10 C40 10 35 18 35 25 C35 32 40 40 50 40 C60 40 65 32 65 25 C65 18 60 10 50 10 Z"/>
+              <rect class="body-shape" x="44" y="38" width="12" height="8"/>
+              <path class="body-shape" d="M30 46 Q18 50 16 65 L16 110 Q18 125 28 130 L32 145 Q36 155 40 160 L40 165 L60 165 L60 160 Q64 155 68 145 L72 130 Q82 125 84 110 L84 65 Q82 50 70 46 Z"/>
+              <path class="body-shape" d="M16 52 Q8 56 6 70 L5 100 Q5 120 8 135 L10 150 L18 150 L18 135 Q19 120 19 100 L19 70 Q18 58 18 54 Z"/>
+              <path class="body-shape" d="M84 52 Q92 56 94 70 L95 100 Q95 120 92 135 L90 150 L82 150 L82 135 Q81 120 81 100 L81 70 Q82 58 82 54 Z"/>
+              <path class="body-shape" d="M40 165 L36 195 Q34 215 33 235 L45 235 L47 215 Q48 195 50 175 Z"/>
+              <path class="body-shape" d="M60 165 L64 195 Q66 215 67 235 L55 235 L53 215 Q52 195 50 175 Z"/>
+              <g class="muscle-lines">
+                <path d="M35 46 Q50 58 65 46"/>
+                <line x1="50" y1="46" x2="50" y2="130"/>
+                <path d="M32 55 Q28 80 35 105"/>
+                <path d="M68 55 Q72 80 65 105"/>
+                <path d="M40 130 Q50 142 60 130"/>
+              </g>
+            </svg>
+            <span>Back View</span>
+          </div>
+          <div class="overlay" data-muscle="back" style="top:12%; left:20%; width:60%; height:10%;"></div>
+          <div class="overlay" data-muscle="shoulders" style="top:12%; left:2%; width:20%; height:8%;"></div>
+          <div class="overlay" data-muscle="shoulders" style="top:12%; right:2%; width:20%; height:8%;"></div>
+          <div class="overlay" data-muscle="back" style="top:22%; left:22%; width:56%; height:22%;"></div>
+          <div class="overlay" data-muscle="arms" style="top:14%; left:0%; width:18%; height:22%;"></div>
+          <div class="overlay" data-muscle="arms" style="top:14%; right:0%; width:18%; height:22%;"></div>
+          <div class="overlay" data-muscle="legs" style="top:46%; left:20%; width:60%; height:40%;"></div>
+        </div>
         <div class="view-label">Back</div>
       </div>
     </div>
@@ -130,7 +149,6 @@
       back: { name: 'Back', latin: 'Latissimus Dorsi & Trapezius', parts: ['Lats', 'Upper Traps', 'Mid Traps', 'Lower Traps', 'Rhomboids', 'Erector Spinae'], exercises: [{n:'Pull-Up',t:'Lats',i:'⬆️'},{n:'Barbell Row',t:'Mid back',i:'🚣'},{n:'Deadlift',t:'Full back',i:'🏋️'}] },
       legs: { name: 'Legs', latin: 'Quadriceps, Hamstrings & Glutes', parts: ['Quadriceps (4 heads)', 'Hamstrings (3 muscles)', 'Glutes', 'Calves'], exercises: [{n:'Squat',t:'Quads & Glutes',i:'🏋️'},{n:'Romanian Deadlift',t:'Hamstrings',i:'🔻'},{n:'Hip Thrust',t:'Glutes',i:'🍑'}] }
     };
-
     document.querySelectorAll('.overlay').forEach(el => {
       el.addEventListener('click', e => {
         e.stopPropagation();
@@ -145,7 +163,6 @@
         document.getElementById('infoPanel').classList.add('visible');
       });
     });
-
     document.addEventListener('click', e => {
       if (!e.target.closest('.overlay') && !e.target.closest('.info-panel')) {
         document.querySelectorAll('.overlay.selected').forEach(m => m.classList.remove('selected'));
