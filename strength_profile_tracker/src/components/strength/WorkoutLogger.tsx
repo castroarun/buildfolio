@@ -141,16 +141,16 @@ export default function WorkoutLogger({ profileId, exerciseId }: WorkoutLoggerPr
               placeholder="kg"
               value={todaySets[setIndex].weight ?? ''}
               onChange={(e) => handleSetChange(setIndex, 'weight', e.target.value)}
-              className="w-8 text-center text-[11px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-0.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-8 text-center text-[11px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-600 rounded px-0.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
             />
-            <span className="text-[10px] text-gray-400">x</span>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500">x</span>
             <input
               type="number"
               inputMode="numeric"
               placeholder={SUGGESTED_REPS[setIndex].toString()}
               value={todaySets[setIndex].reps ?? ''}
               onChange={(e) => handleSetChange(setIndex, 'reps', e.target.value)}
-              className="w-6 text-center text-[11px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-0.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-6 text-center text-[11px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-600 rounded px-0.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
             />
           </div>
         </div>
