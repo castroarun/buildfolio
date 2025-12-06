@@ -14,6 +14,7 @@
 | 2.0 | 2025-12-02 | Expanded to 25 exercises, body part filtering, motivational quotes |
 | 3.0 | 2025-12-06 | Added dark mode, Workout Logger, Achievements, Strength Score, AI Coach Tips |
 | 3.1 | 2025-12-06 | Added Progress Visualizations (5 chart types) |
+| 3.2 | 2025-12-06 | Documented open items: Body Anatomy Visualization, Muscle Heatmap (deferred) |
 
 ---
 
@@ -782,7 +783,55 @@ src/
 
 ---
 
-## 6. Success Criteria
+## 6. Open Items / Future Considerations
+
+The following features are documented for future development:
+
+### 6.1 Body Anatomy Visualization
+
+**Status:** Deferred
+
+**Description:**
+Interactive body anatomy visualization showing muscle groups, muscle heads, and recommended exercises.
+
+**Requirements:**
+- MuscleWiki-style clean line art illustration (front/back views)
+- Tap-to-highlight muscle groups with color fill
+- Show muscle head details:
+  - Shoulders: Anterior (Front), Lateral (Side), Posterior (Rear)
+  - Chest: Upper (Clavicular), Middle (Sternal), Lower (Costal)
+  - Triceps: Long Head, Lateral Head, Medial Head
+  - Back: Lats, Upper/Mid/Lower Traps, Rhomboids
+- Display recommended exercises per muscle group
+- Light/dark mode support
+
+**Blockers:**
+- Requires high-quality professional anatomy illustration (SVG or PNG)
+- Options: Commission custom artwork, use public domain images from Wikimedia Commons/FreeSVG
+- Reference style: musclewiki.com body map
+
+**Mockup Location:** `/public/anatomy-musclewiki-style.html` (placeholder ready for custom images)
+
+### 6.2 Muscle Training Heatmap
+
+**Status:** Deferred
+
+**Description:**
+Visual heatmap showing which muscles are trained more/less based on workout data.
+
+**Requirements:**
+- Color-coded intensity (gray → green → amber → red)
+- Calculate training volume per body part from workout logs
+- Show overworked, balanced, and neglected muscle groups
+- Integrate with body anatomy visualization
+
+**Notes:**
+- Component was implemented (`MuscleHeatmap.tsx`) but removed pending anatomy visualization completion
+- Depends on anatomy visualization for best user experience
+
+---
+
+## 7. Success Criteria
 
 | Metric | Target |
 |--------|--------|
