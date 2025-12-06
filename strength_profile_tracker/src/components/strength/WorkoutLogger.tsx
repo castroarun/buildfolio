@@ -10,6 +10,8 @@ import {
   createEmptySets,
   getTodayDate
 } from '@/lib/storage/workouts'
+import { useUnit } from '@/contexts'
+import { formatWeightValue } from '@/lib/utils/units'
 
 interface WorkoutLoggerProps {
   profileId: string
@@ -17,6 +19,7 @@ interface WorkoutLoggerProps {
 }
 
 export default function WorkoutLogger({ profileId, exerciseId }: WorkoutLoggerProps) {
+  const { unit } = useUnit()
   const [pastSessions, setPastSessions] = useState<WorkoutSession[]>([])
   const [todaySets, setTodaySets] = useState<WorkoutSet[]>(createEmptySets())
   const [isLoaded, setIsLoaded] = useState(false)
@@ -124,7 +127,7 @@ export default function WorkoutLogger({ profileId, exerciseId }: WorkoutLoggerPr
               >
                 {hasData ? (
                   <span className="text-gray-600 dark:text-gray-300">
-                    {set.weight}<span className="text-gray-400">kg</span> x {set.reps}
+                    {formatWeightValue(set.weight!, unit)}<span className="text-gray-400">{unit}</span> x {set.reps}
                   </span>
                 ) : (
                   <span className="text-gray-300 dark:text-gray-600">-</span>
@@ -138,7 +141,7 @@ export default function WorkoutLogger({ profileId, exerciseId }: WorkoutLoggerPr
             <input
               type="number"
               inputMode="numeric"
-              placeholder="kg"
+              placeholder={unit}
               value={todaySets[setIndex].weight ?? ''}
               onChange={(e) => handleSetChange(setIndex, 'weight', e.target.value)}
               className="w-8 text-center text-[11px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-600 rounded px-0.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400"

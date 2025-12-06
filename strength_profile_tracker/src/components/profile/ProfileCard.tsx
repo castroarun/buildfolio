@@ -3,12 +3,16 @@
 import Link from 'next/link'
 import { Profile, SEX_INFO } from '@/types'
 import { Card } from '@/components/ui'
+import { useUnit } from '@/contexts'
+import { formatWeightValue } from '@/lib/utils/units'
 
 interface ProfileCardProps {
   profile: Profile
 }
 
 export default function ProfileCard({ profile }: ProfileCardProps) {
+  const { unit } = useUnit()
+
   // Generate initials from name
   const initials = profile.name
     .split(' ')
@@ -43,7 +47,7 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
               <span className="mx-2">•</span>
               <span>{profile.height} cm</span>
               <span className="mx-2">•</span>
-              <span>{profile.weight} kg</span>
+              <span>{formatWeightValue(profile.weight, unit)} {unit}</span>
             </div>
           </div>
 

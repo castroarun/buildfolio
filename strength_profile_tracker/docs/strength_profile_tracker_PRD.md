@@ -295,7 +295,7 @@ interface ExerciseInfo {
 - [x] Add 2-3 more exercises
 - [x] Improved animations and transitions
 - [x] Gender-specific calculations
-- [ ] Units toggle (kg/lbs)
+- [x] Units toggle (kg/lbs)
 - [x] Dark mode support
 
 ### Phase 3: Polish & Launch (2 weeks)
