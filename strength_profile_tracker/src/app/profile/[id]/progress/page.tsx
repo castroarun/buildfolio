@@ -77,20 +77,20 @@ export default function ProgressPage({ params }: ProgressPageProps) {
           </p>
         </div>
 
-        {/* 1. Weight Progression Chart */}
-        <WeightProgressionChart />
+        {/* 1. Strength Score History */}
+        <ScoreHistory />
 
-        {/* 2. Body Part Radar Chart */}
-        <BodyPartRadarChart />
-
-        {/* 3. Calendar Heatmap */}
-        <CalendarHeatmap />
-
-        {/* 4. Personal Records */}
+        {/* 2. Personal Records */}
         <PersonalRecords />
 
-        {/* 5. Score History */}
-        <ScoreHistory />
+        {/* 3. Body Part Balance */}
+        <BodyPartRadarChart />
+
+        {/* 4. Workout Frequency */}
+        <CalendarHeatmap />
+
+        {/* 5. Exercise Progression */}
+        <WeightProgressionChart />
       </main>
     </div>
   )
@@ -133,7 +133,7 @@ function WeightProgressionChart() {
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-          Weight Progression
+          Exercise Progression
         </h3>
         <span className="text-xs text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">
           Bench Press
