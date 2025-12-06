@@ -3,11 +3,12 @@
 import { use, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui'
-import { Profile, BodyPart, Exercise } from '@/types'
+import { Profile, BodyPart, Exercise, ALL_BODY_PARTS } from '@/types'
 import { getProfileById } from '@/lib/storage/profiles'
 import { calculateStrengthScore, EXERCISES } from '@/lib/calculations/strength'
 import { getAllWorkouts, formatSessionDate } from '@/lib/storage/workouts'
 import { getScoreHistory, ScoreHistoryEntry } from '@/lib/storage/seedData'
+import { MuscleHeatmap } from '@/components/progress'
 
 interface ProgressPageProps {
   params: Promise<{ id: string }>
@@ -30,6 +31,12 @@ interface WorkoutDay {
   count: number
 }
 
+interface MuscleIntensity {
+  bodyPart: BodyPart
+  intensity: number
+  workoutCount: number
+}
+
 export default function ProgressPage({ params }: ProgressPageProps) {
   const { id } = use(params)
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -39,6 +46,7 @@ export default function ProgressPage({ params }: ProgressPageProps) {
   const [currentScore, setCurrentScore] = useState(0)
   const [scoreHistory, setScoreHistory] = useState<ScoreHistoryEntry[]>([])
   const [exerciseProgress, setExerciseProgress] = useState<{exercise: string, data: {date: string, weight: number}[]}[]>([])
+  const [muscleIntensity, setMuscleIntensity] = useState<MuscleIntensity[]>([])
   const [profileColor, setProfileColor] = useState('#3B82F6')
   const [isLoading, setIsLoading] = useState(true)
 
@@ -170,6 +178,29 @@ export default function ProgressPage({ params }: ProgressPageProps) {
       .filter(p => p.data.length >= 2)
 
     setExerciseProgress(progress)
+
+    // Calculate muscle intensity from workout data
+    const workoutsByBodyPart: Record<BodyPart, number> = {
+      chest: 0, back: 0, shoulders: 0, legs: 0, arms: 0, core: 0
+    }
+
+    allWorkouts.forEach(session => {
+      const exercise = EXERCISES.find(e => e.id === session.exerciseId)
+      if (exercise) {
+        workoutsByBodyPart[exercise.bodyPart] += 1
+      }
+    })
+
+    // Find max to normalize intensity (0-100)
+    const maxWorkouts = Math.max(...Object.values(workoutsByBodyPart), 1)
+
+    const intensityData: MuscleIntensity[] = ALL_BODY_PARTS.map(bodyPart => ({
+      bodyPart,
+      workoutCount: workoutsByBodyPart[bodyPart],
+      intensity: Math.round((workoutsByBodyPart[bodyPart] / maxWorkouts) * 100)
+    }))
+
+    setMuscleIntensity(intensityData)
     setIsLoading(false)
   }, [id])
 
@@ -217,7 +248,10 @@ export default function ProgressPage({ params }: ProgressPageProps) {
         {/* 3. Body Part Balance */}
         <BodyPartRadarChart data={bodyPartData} color={profileColor} />
 
-        {/* 4. Workout Frequency */}
+        {/* 4. Muscle Heatmap */}
+        <MuscleHeatmap data={muscleIntensity} />
+
+        {/* 5. Workout Frequency */}
         <CalendarHeatmap days={workoutDays} />
 
         {/* 5. Exercise Progression */}
