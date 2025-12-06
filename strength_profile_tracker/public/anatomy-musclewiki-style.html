@@ -3,43 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Muscle Map - MuscleWiki Style</title>
+  <title>Muscle Anatomy - MuscleWiki Style</title>
   <style>
+    :root {
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --text-primary: #1a1a2e;
+      --text-secondary: #6c757d;
+      --border-color: #e9ecef;
+      --muscle-default: #e8d4c4;
+      --muscle-outline: #c4a88a;
+      --muscle-hover: #ef4444;
+      --muscle-selected: #dc2626;
+      --skin-tone: #f5dcc8;
+      --skin-shadow: #e8c9b0;
+    }
+
+    .dark {
+      --bg-primary: #0f0f1a;
+      --bg-secondary: #1a1a2e;
+      --text-primary: #f1f1f1;
+      --text-secondary: #a0a0a0;
+      --border-color: #2d2d44;
+      --muscle-default: #4a3f35;
+      --muscle-outline: #6b5a4a;
+      --muscle-hover: #ef4444;
+      --muscle-selected: #dc2626;
+      --skin-tone: #3d3428;
+      --skin-shadow: #2d2620;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    :root {
-      --bg-primary: #ffffff;
-      --bg-secondary: #f8fafc;
-      --bg-card: #ffffff;
-      --text-primary: #1e293b;
-      --text-secondary: #64748b;
-      --text-muted: #94a3b8;
-      --border-color: #e2e8f0;
-      --muscle-default: #e2e8f0;
-      --muscle-hover: #cbd5e1;
-      --muscle-active: #3b82f6;
-      --accent: #3b82f6;
-    }
-
-    [data-theme="dark"] {
-      --bg-primary: #0f172a;
-      --bg-secondary: #1e293b;
-      --bg-card: #1e293b;
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --border-color: #334155;
-      --muscle-default: #334155;
-      --muscle-hover: #475569;
-      --muscle-active: #3b82f6;
-    }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
@@ -47,33 +48,22 @@
     }
 
     .container {
-      max-width: 420px;
+      max-width: 500px;
       margin: 0 auto;
-      min-height: 100vh;
+      padding: 16px;
     }
 
     /* Header */
     .header {
-      background: #2C3E50;
-      color: white;
-      padding: 16px 20px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-    }
-
-    .header-left {
-      display: flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    .back-btn {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 4px;
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .header h1 {
@@ -81,60 +71,61 @@
       font-weight: 600;
     }
 
-    .header-right {
+    .header-controls {
       display: flex;
       gap: 8px;
     }
 
-    .icon-btn {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: white;
-      width: 36px;
-      height: 36px;
+    .toggle-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
       border-radius: 8px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
     }
 
-    .icon-btn:hover {
-      background: rgba(255,255,255,0.2);
+    .toggle-btn:hover {
+      background: var(--border-color);
     }
 
-    /* Main content */
-    .main {
-      padding: 20px;
+    .toggle-btn.active {
+      background: var(--muscle-selected);
+      color: white;
+      border-color: var(--muscle-selected);
     }
 
     /* View Toggle */
     .view-toggle {
       display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 4px;
       background: var(--bg-secondary);
       border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 20px;
+      margin: 16px auto;
+      width: fit-content;
+      border: 1px solid var(--border-color);
     }
 
     .view-btn {
-      flex: 1;
-      padding: 10px 20px;
+      padding: 10px 32px;
       border: none;
       background: transparent;
       color: var(--text-secondary);
-      font-size: 14px;
-      font-weight: 500;
       border-radius: 8px;
       cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
       transition: all 0.2s;
     }
 
     .view-btn.active {
-      background: var(--bg-card);
-      color: var(--text-primary);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      background: var(--muscle-selected);
+      color: white;
     }
 
     /* Body Container */
@@ -145,94 +136,107 @@
     }
 
     .body-svg {
-      width: 220px;
-      height: auto;
+      width: 280px;
+      height: 520px;
     }
 
-    /* Muscle regions */
+    /* Muscle Styling */
     .muscle {
       fill: var(--muscle-default);
-      stroke: var(--border-color);
-      stroke-width: 0.5;
+      stroke: var(--muscle-outline);
+      stroke-width: 1;
       cursor: pointer;
-      transition: fill 0.2s, transform 0.1s;
+      transition: fill 0.2s, stroke 0.2s;
     }
 
     .muscle:hover {
       fill: var(--muscle-hover);
+      stroke: var(--muscle-selected);
+      stroke-width: 1.5;
     }
 
-    .muscle.active {
-      fill: var(--muscle-active);
-      stroke: var(--accent);
-      stroke-width: 1;
+    .muscle.selected {
+      fill: var(--muscle-selected);
+      stroke: #991b1b;
+      stroke-width: 2;
     }
 
-    .muscle.active:hover {
-      fill: #2563eb;
+    .skin {
+      fill: var(--skin-tone);
+      stroke: var(--skin-shadow);
+      stroke-width: 0.5;
     }
 
-    /* Body outline */
-    .body-outline {
+    .outline {
       fill: none;
-      stroke: var(--border-color);
-      stroke-width: 1;
+      stroke: var(--muscle-outline);
+      stroke-width: 1.5;
     }
 
-    .body-fill {
-      fill: var(--bg-secondary);
-    }
-
-    /* Selected muscle panel */
-    .muscle-panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
+    /* Muscle Info Panel */
+    .muscle-info {
+      background: var(--bg-secondary);
       border-radius: 16px;
       padding: 20px;
-      margin-top: 20px;
-    }
-
-    .muscle-panel.hidden {
+      margin-top: 16px;
+      border: 1px solid var(--border-color);
       display: none;
     }
 
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .muscle-info.visible {
+      display: block;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .muscle-info h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--muscle-selected);
+    }
+
+    .muscle-info .subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
       margin-bottom: 16px;
     }
 
-    .panel-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .panel-badge {
-      background: var(--accent);
-      color: white;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-
-    .panel-section {
+    .info-section {
       margin-bottom: 16px;
     }
 
-    .panel-section:last-child {
-      margin-bottom: 0;
-    }
-
-    .section-label {
-      font-size: 11px;
+    .info-section h3 {
+      font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       margin-bottom: 8px;
+    }
+
+    .muscle-parts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .muscle-part {
+      padding: 6px 12px;
+      background: var(--bg-primary);
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid var(--border-color);
     }
 
     .exercise-list {
@@ -242,369 +246,976 @@
     }
 
     .exercise-item {
-      background: var(--bg-secondary);
-      padding: 12px 16px;
-      border-radius: 10px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-    }
-
-    .exercise-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .exercise-tag {
-      font-size: 11px;
-      color: var(--accent);
-      font-weight: 500;
-    }
-
-    /* Muscle sub-parts */
-    .sub-parts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .sub-part {
-      background: var(--bg-secondary);
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      color: var(--text-secondary);
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-primary);
+      border-radius: 10px;
       border: 1px solid var(--border-color);
+    }
+
+    .exercise-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--muscle-selected);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+
+    .exercise-details h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .exercise-details p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .legend-dot.default {
+      background: var(--muscle-default);
+      border: 1px solid var(--muscle-outline);
+    }
+
+    .legend-dot.active {
+      background: var(--muscle-selected);
     }
 
     /* Instructions */
     .instructions {
       text-align: center;
       padding: 16px;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    /* Stats bar */
-    .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .stat-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 4px;
+      color: var(--text-secondary);
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
+  <header class="header">
+    <h1>Muscle Anatomy</h1>
+    <div class="header-controls">
+      <button class="toggle-btn" id="themeToggle">🌙</button>
+    </div>
+  </header>
+
   <div class="container">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-left">
-        <button class="back-btn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <h1>Muscle Map</h1>
-      </div>
-      <div class="header-right">
-        <button class="icon-btn" id="themeToggle" title="Toggle theme">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-        </button>
-      </div>
-    </header>
+    <!-- View Toggle -->
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="front">Front</button>
+      <button class="view-btn" data-view="back">Back</button>
+    </div>
 
-    <!-- Main Content -->
-    <main class="main">
-      <!-- View Toggle -->
-      <div class="view-toggle">
-        <button class="view-btn active" data-view="front">Front</button>
-        <button class="view-btn" data-view="back">Back</button>
-      </div>
-
-      <!-- Body Diagram -->
-      <div class="body-container">
-        <!-- Front View -->
-        <svg id="frontView" class="body-svg" viewBox="0 0 200 420">
+    <!-- Body Container -->
+    <div class="body-container">
+      <!-- Front View SVG -->
+      <svg id="frontView" class="body-svg" viewBox="0 0 200 380" xmlns="http://www.w3.org/2000/svg">
+        <!-- Body Outline / Skin Base -->
+        <g class="body-base">
           <!-- Head -->
-          <ellipse cx="100" cy="35" rx="28" ry="32" class="body-fill"/>
-          <ellipse cx="100" cy="35" rx="28" ry="32" class="body-outline"/>
-
+          <ellipse class="skin" cx="100" cy="28" rx="22" ry="26"/>
           <!-- Neck -->
-          <rect x="88" y="65" width="24" height="20" rx="4" class="body-fill"/>
+          <path class="skin" d="M88 50 Q88 58 85 65 L115 65 Q112 58 112 50 Z"/>
 
-          <!-- Torso outline -->
-          <path d="M60,85 L55,90 Q35,100 38,170 L35,220 L60,225 L65,200 L135,200 L140,225 L165,220 L162,170 Q165,100 145,90 L140,85 Z" class="body-fill"/>
+          <!-- Torso -->
+          <path class="skin" d="
+            M60 65
+            Q45 70 38 90
+            L35 140
+            Q35 165 40 190
+            L45 210
+            Q48 230 55 250
+            L60 260
+            Q65 270 75 275
+            L85 278
+            Q95 280 100 280
+            Q105 280 115 278
+            L125 275
+            Q135 270 140 260
+            L145 250
+            Q152 230 155 210
+            L160 190
+            Q165 165 165 140
+            L162 90
+            Q155 70 140 65
+            Z
+          "/>
 
-          <!-- Shoulders - Deltoids -->
-          <ellipse cx="48" cy="100" rx="22" ry="18" class="muscle" data-muscle="shoulders" data-name="Deltoids"/>
-          <ellipse cx="152" cy="100" rx="22" ry="18" class="muscle" data-muscle="shoulders" data-name="Deltoids"/>
+          <!-- Left Arm -->
+          <path class="skin" d="
+            M38 90
+            Q30 95 25 110
+            L18 150
+            Q15 170 15 190
+            L14 220
+            Q13 240 15 255
+            L18 275
+            Q20 285 22 290
+            L30 290
+            Q35 285 36 275
+            L38 255
+            Q40 240 40 220
+            L42 190
+            Q43 170 45 150
+            L50 120
+            Q52 105 50 95
+            Z
+          "/>
 
-          <!-- Chest - Pectorals -->
-          <path d="M62,95 Q100,88 138,95 Q145,120 100,140 Q55,120 62,95" class="muscle" data-muscle="chest" data-name="Pectorals"/>
+          <!-- Right Arm -->
+          <path class="skin" d="
+            M162 90
+            Q170 95 175 110
+            L182 150
+            Q185 170 185 190
+            L186 220
+            Q187 240 185 255
+            L182 275
+            Q180 285 178 290
+            L170 290
+            Q165 285 164 275
+            L162 255
+            Q160 240 160 220
+            L158 190
+            Q157 170 155 150
+            L150 120
+            Q148 105 150 95
+            Z
+          "/>
 
-          <!-- Arms - Biceps -->
-          <ellipse cx="35" cy="145" rx="14" ry="35" class="muscle" data-muscle="arms" data-name="Biceps"/>
-          <ellipse cx="165" cy="145" rx="14" ry="35" class="muscle" data-muscle="arms" data-name="Biceps"/>
+          <!-- Left Leg -->
+          <path class="skin" d="
+            M60 260
+            L55 300
+            Q52 330 50 360
+            L48 400
+            Q47 430 48 460
+            L50 500
+            Q52 530 55 560
+            L65 560
+            Q68 530 70 500
+            L72 460
+            Q73 430 73 400
+            L75 360
+            Q78 330 82 300
+            L85 278
+          "/>
 
-          <!-- Forearms -->
-          <ellipse cx="28" cy="205" rx="10" ry="30" class="muscle" data-muscle="forearms" data-name="Forearms"/>
-          <ellipse cx="172" cy="205" rx="10" ry="30" class="muscle" data-muscle="forearms" data-name="Forearms"/>
+          <!-- Right Leg -->
+          <path class="skin" d="
+            M140 260
+            L145 300
+            Q148 330 150 360
+            L152 400
+            Q153 430 152 460
+            L150 500
+            Q148 530 145 560
+            L135 560
+            Q132 530 130 500
+            L128 460
+            Q127 430 127 400
+            L125 360
+            Q122 330 118 300
+            L115 278
+          "/>
+        </g>
 
-          <!-- Core - Abs -->
-          <rect x="75" y="142" width="50" height="58" rx="8" class="muscle" data-muscle="core" data-name="Abdominals"/>
+        <!-- Muscles - Front View -->
+        <g class="muscles-front">
+          <!-- CHEST - Pectorals -->
+          <path class="muscle" id="chest-left" data-muscle="chest" d="
+            M62 72
+            Q55 78 52 90
+            L50 105
+            Q50 115 55 122
+            L68 128
+            Q80 130 92 128
+            L97 120
+            Q98 110 97 100
+            L95 85
+            Q92 75 85 70
+            Z
+          "/>
+          <path class="muscle" id="chest-right" data-muscle="chest" d="
+            M138 72
+            Q145 78 148 90
+            L150 105
+            Q150 115 145 122
+            L132 128
+            Q120 130 108 128
+            L103 120
+            Q102 110 103 100
+            L105 85
+            Q108 75 115 70
+            Z
+          "/>
 
-          <!-- Obliques -->
-          <path d="M65,145 Q60,175 65,200 L75,195 L75,150 Z" class="muscle" data-muscle="core" data-name="Obliques"/>
-          <path d="M135,145 Q140,175 135,200 L125,195 L125,150 Z" class="muscle" data-muscle="core" data-name="Obliques"/>
+          <!-- SHOULDERS - Deltoids -->
+          <path class="muscle" id="shoulder-left" data-muscle="shoulders" d="
+            M38 75
+            Q30 78 28 88
+            L26 102
+            Q26 115 30 125
+            L38 130
+            Q45 130 50 125
+            L52 115
+            Q55 105 54 95
+            L52 85
+            Q50 75 45 72
+            Z
+          "/>
+          <path class="muscle" id="shoulder-right" data-muscle="shoulders" d="
+            M162 75
+            Q170 78 172 88
+            L174 102
+            Q174 115 170 125
+            L162 130
+            Q155 130 150 125
+            L148 115
+            Q145 105 146 95
+            L148 85
+            Q150 75 155 72
+            Z
+          "/>
 
-          <!-- Legs - Quads -->
-          <ellipse cx="78" cy="280" rx="26" ry="65" class="muscle" data-muscle="legs" data-name="Quadriceps"/>
-          <ellipse cx="122" cy="280" rx="26" ry="65" class="muscle" data-muscle="legs" data-name="Quadriceps"/>
+          <!-- BICEPS -->
+          <path class="muscle" id="bicep-left" data-muscle="arms" d="
+            M28 130
+            Q22 135 20 150
+            L18 170
+            Q18 185 22 195
+            L30 200
+            Q38 200 42 195
+            L45 180
+            Q47 165 45 150
+            L42 138
+            Q40 130 35 128
+            Z
+          "/>
+          <path class="muscle" id="bicep-right" data-muscle="arms" d="
+            M172 130
+            Q178 135 180 150
+            L182 170
+            Q182 185 178 195
+            L170 200
+            Q162 200 158 195
+            L155 180
+            Q153 165 155 150
+            L158 138
+            Q160 130 165 128
+            Z
+          "/>
 
-          <!-- Calves -->
-          <ellipse cx="72" cy="375" rx="16" ry="38" class="muscle" data-muscle="calves" data-name="Calves"/>
-          <ellipse cx="128" cy="375" rx="16" ry="38" class="muscle" data-muscle="calves" data-name="Calves"/>
-        </svg>
+          <!-- FOREARMS -->
+          <path class="muscle" id="forearm-left" data-muscle="arms" d="
+            M20 200
+            Q16 210 15 225
+            L14 245
+            Q14 260 16 270
+            L22 275
+            Q28 275 32 270
+            L35 255
+            Q37 240 36 225
+            L34 210
+            Q32 200 28 198
+            Z
+          "/>
+          <path class="muscle" id="forearm-right" data-muscle="arms" d="
+            M180 200
+            Q184 210 185 225
+            L186 245
+            Q186 260 184 270
+            L178 275
+            Q172 275 168 270
+            L165 255
+            Q163 240 164 225
+            L166 210
+            Q168 200 172 198
+            Z
+          "/>
 
-        <!-- Back View (hidden by default) -->
-        <svg id="backView" class="body-svg" viewBox="0 0 200 420" style="display: none;">
+          <!-- ABS / CORE -->
+          <path class="muscle" id="abs-upper" data-muscle="core" d="
+            M85 130
+            Q80 135 78 145
+            L78 160
+            Q80 170 85 175
+            L95 178
+            Q100 179 105 178
+            L115 175
+            Q120 170 122 160
+            L122 145
+            Q120 135 115 130
+            Z
+          "/>
+          <path class="muscle" id="abs-middle" data-muscle="core" d="
+            M80 180
+            Q76 188 75 200
+            L75 215
+            Q77 225 82 230
+            L92 233
+            Q100 234 108 233
+            L118 230
+            Q123 225 125 215
+            L125 200
+            Q124 188 120 180
+            Z
+          "/>
+          <path class="muscle" id="abs-lower" data-muscle="core" d="
+            M78 235
+            Q74 245 73 258
+            L75 268
+            Q80 275 90 277
+            L100 278
+            L110 277
+            Q120 275 125 268
+            L127 258
+            Q126 245 122 235
+            Z
+          "/>
+
+          <!-- OBLIQUES -->
+          <path class="muscle" id="oblique-left" data-muscle="core" d="
+            M55 135
+            Q50 145 48 165
+            L47 190
+            Q48 215 52 235
+            L58 250
+            Q62 258 68 262
+            L72 255
+            Q75 240 75 220
+            L76 195
+            Q76 170 75 150
+            L73 138
+            Q70 130 62 128
+            Z
+          "/>
+          <path class="muscle" id="oblique-right" data-muscle="core" d="
+            M145 135
+            Q150 145 152 165
+            L153 190
+            Q152 215 148 235
+            L142 250
+            Q138 258 132 262
+            L128 255
+            Q125 240 125 220
+            L124 195
+            Q124 170 125 150
+            L127 138
+            Q130 130 138 128
+            Z
+          "/>
+
+          <!-- QUADRICEPS -->
+          <path class="muscle" id="quad-left" data-muscle="legs" d="
+            M62 268
+            Q55 280 52 300
+            L50 330
+            Q50 360 52 385
+            L55 400
+            Q60 410 68 412
+            L78 410
+            Q85 405 87 395
+            L88 370
+            Q88 340 85 310
+            L82 285
+            Q80 272 75 268
+            Z
+          "/>
+          <path class="muscle" id="quad-right" data-muscle="legs" d="
+            M138 268
+            Q145 280 148 300
+            L150 330
+            Q150 360 148 385
+            L145 400
+            Q140 410 132 412
+            L122 410
+            Q115 405 113 395
+            L112 370
+            Q112 340 115 310
+            L118 285
+            Q120 272 125 268
+            Z
+          "/>
+
+          <!-- Inner Thigh / Adductors -->
+          <path class="muscle" id="adductor-left" data-muscle="legs" d="
+            M78 278
+            Q82 290 85 310
+            L86 340
+            Q85 360 83 375
+            L80 380
+            Q75 382 72 380
+            L70 370
+            Q68 350 70 325
+            L72 300
+            Q74 285 78 278
+            Z
+          "/>
+          <path class="muscle" id="adductor-right" data-muscle="legs" d="
+            M122 278
+            Q118 290 115 310
+            L114 340
+            Q115 360 117 375
+            L120 380
+            Q125 382 128 380
+            L130 370
+            Q132 350 130 325
+            L128 300
+            Q126 285 122 278
+            Z
+          "/>
+        </g>
+
+        <!-- Muscle separation lines for definition -->
+        <g class="muscle-lines" fill="none" stroke="var(--muscle-outline)" stroke-width="0.5" opacity="0.6">
+          <!-- Chest separation -->
+          <line x1="100" y1="75" x2="100" y2="130"/>
+          <!-- Ab lines -->
+          <line x1="100" y1="135" x2="100" y2="270"/>
+          <line x1="82" y1="155" x2="118" y2="155"/>
+          <line x1="80" y1="195" x2="120" y2="195"/>
+          <line x1="78" y1="232" x2="122" y2="232"/>
+        </g>
+      </svg>
+
+      <!-- Back View SVG -->
+      <svg id="backView" class="body-svg" viewBox="0 0 200 380" style="display: none;" xmlns="http://www.w3.org/2000/svg">
+        <!-- Body Outline / Skin Base -->
+        <g class="body-base">
           <!-- Head -->
-          <ellipse cx="100" cy="35" rx="28" ry="32" class="body-fill"/>
-          <ellipse cx="100" cy="35" rx="28" ry="32" class="body-outline"/>
-
+          <ellipse class="skin" cx="100" cy="28" rx="22" ry="26"/>
           <!-- Neck -->
-          <rect x="88" y="65" width="24" height="20" rx="4" class="body-fill"/>
+          <path class="skin" d="M88 50 Q88 58 85 65 L115 65 Q112 58 112 50 Z"/>
 
-          <!-- Torso outline -->
-          <path d="M60,85 L55,90 Q35,100 38,170 L35,220 L60,225 L65,200 L135,200 L140,225 L165,220 L162,170 Q165,100 145,90 L140,85 Z" class="body-fill"/>
+          <!-- Torso -->
+          <path class="skin" d="
+            M60 65
+            Q45 70 38 90
+            L35 140
+            Q35 165 40 190
+            L45 210
+            Q48 230 55 250
+            L60 260
+            Q65 270 75 275
+            L85 278
+            Q95 280 100 280
+            Q105 280 115 278
+            L125 275
+            Q135 270 140 260
+            L145 250
+            Q152 230 155 210
+            L160 190
+            Q165 165 165 140
+            L162 90
+            Q155 70 140 65
+            Z
+          "/>
 
-          <!-- Shoulders - Rear Deltoids -->
-          <ellipse cx="48" cy="100" rx="22" ry="18" class="muscle" data-muscle="shoulders" data-name="Rear Deltoids"/>
-          <ellipse cx="152" cy="100" rx="22" ry="18" class="muscle" data-muscle="shoulders" data-name="Rear Deltoids"/>
+          <!-- Left Arm -->
+          <path class="skin" d="
+            M38 90
+            Q30 95 25 110
+            L18 150
+            Q15 170 15 190
+            L14 220
+            Q13 240 15 255
+            L18 275
+            Q20 285 22 290
+            L30 290
+            Q35 285 36 275
+            L38 255
+            Q40 240 40 220
+            L42 190
+            Q43 170 45 150
+            L50 120
+            Q52 105 50 95
+            Z
+          "/>
 
-          <!-- Upper Traps -->
-          <path d="M75,72 L100,68 L125,72 L130,90 L100,85 L70,90 Z" class="muscle" data-muscle="back" data-name="Upper Trapezius"/>
+          <!-- Right Arm -->
+          <path class="skin" d="
+            M162 90
+            Q170 95 175 110
+            L182 150
+            Q185 170 185 190
+            L186 220
+            Q187 240 185 255
+            L182 275
+            Q180 285 178 290
+            L170 290
+            Q165 285 164 275
+            L162 255
+            Q160 240 160 220
+            L158 190
+            Q157 170 155 150
+            L150 120
+            Q148 105 150 95
+            Z
+          "/>
 
-          <!-- Mid Back - Lats & Rhomboids -->
-          <path d="M62,92 L70,92 L75,180 L100,185 L125,180 L130,92 L138,92 Q145,130 140,180 L100,195 L60,180 Q55,130 62,92" class="muscle" data-muscle="back" data-name="Latissimus Dorsi"/>
+          <!-- Left Leg -->
+          <path class="skin" d="
+            M60 260
+            L55 300
+            Q52 330 50 360
+            L48 400
+            Q47 430 48 460
+            L50 500
+            Q52 530 55 560
+            L65 560
+            Q68 530 70 500
+            L72 460
+            Q73 430 73 400
+            L75 360
+            Q78 330 82 300
+            L85 278
+          "/>
 
-          <!-- Lower Back -->
-          <rect x="80" y="182" width="40" height="25" rx="5" class="muscle" data-muscle="back" data-name="Erector Spinae"/>
+          <!-- Right Leg -->
+          <path class="skin" d="
+            M140 260
+            L145 300
+            Q148 330 150 360
+            L152 400
+            Q153 430 152 460
+            L150 500
+            Q148 530 145 560
+            L135 560
+            Q132 530 130 500
+            L128 460
+            Q127 430 127 400
+            L125 360
+            Q122 330 118 300
+            L115 278
+          "/>
+        </g>
 
-          <!-- Arms - Triceps -->
-          <ellipse cx="35" cy="145" rx="14" ry="35" class="muscle" data-muscle="arms" data-name="Triceps"/>
-          <ellipse cx="165" cy="145" rx="14" ry="35" class="muscle" data-muscle="arms" data-name="Triceps"/>
+        <!-- Muscles - Back View -->
+        <g class="muscles-back">
+          <!-- TRAPEZIUS -->
+          <path class="muscle" id="trap-left" data-muscle="back" d="
+            M62 65
+            Q55 70 52 80
+            L50 95
+            Q52 105 60 110
+            L75 115
+            Q88 115 95 108
+            L98 95
+            Q98 82 95 72
+            L88 65
+            Z
+          "/>
+          <path class="muscle" id="trap-right" data-muscle="back" d="
+            M138 65
+            Q145 70 148 80
+            L150 95
+            Q148 105 140 110
+            L125 115
+            Q112 115 105 108
+            L102 95
+            Q102 82 105 72
+            L112 65
+            Z
+          "/>
 
-          <!-- Forearms -->
-          <ellipse cx="28" cy="205" rx="10" ry="30" class="muscle" data-muscle="forearms" data-name="Forearms"/>
-          <ellipse cx="172" cy="205" rx="10" ry="30" class="muscle" data-muscle="forearms" data-name="Forearms"/>
+          <!-- REAR DELTOIDS -->
+          <path class="muscle" id="rear-delt-left" data-muscle="shoulders" d="
+            M38 78
+            Q30 82 28 95
+            L27 110
+            Q28 122 35 128
+            L45 130
+            Q52 128 55 120
+            L56 108
+            Q56 95 52 85
+            L48 78
+            Z
+          "/>
+          <path class="muscle" id="rear-delt-right" data-muscle="shoulders" d="
+            M162 78
+            Q170 82 172 95
+            L173 110
+            Q172 122 165 128
+            L155 130
+            Q148 128 145 120
+            L144 108
+            Q144 95 148 85
+            L152 78
+            Z
+          "/>
 
-          <!-- Glutes -->
-          <ellipse cx="82" cy="225" rx="22" ry="18" class="muscle" data-muscle="glutes" data-name="Gluteus Maximus"/>
-          <ellipse cx="118" cy="225" rx="22" ry="18" class="muscle" data-muscle="glutes" data-name="Gluteus Maximus"/>
+          <!-- LATS -->
+          <path class="muscle" id="lat-left" data-muscle="back" d="
+            M52 115
+            Q45 125 42 145
+            L40 175
+            Q42 200 48 220
+            L55 235
+            Q62 245 72 248
+            L80 245
+            Q85 240 88 230
+            L90 210
+            Q92 185 90 160
+            L88 140
+            Q85 125 78 118
+            Z
+          "/>
+          <path class="muscle" id="lat-right" data-muscle="back" d="
+            M148 115
+            Q155 125 158 145
+            L160 175
+            Q158 200 152 220
+            L145 235
+            Q138 245 128 248
+            L120 245
+            Q115 240 112 230
+            L110 210
+            Q108 185 110 160
+            L112 140
+            Q115 125 122 118
+            Z
+          "/>
 
-          <!-- Hamstrings -->
-          <ellipse cx="78" cy="295" rx="24" ry="55" class="muscle" data-muscle="legs" data-name="Hamstrings"/>
-          <ellipse cx="122" cy="295" rx="24" ry="55" class="muscle" data-muscle="legs" data-name="Hamstrings"/>
+          <!-- RHOMBOIDS / MID BACK -->
+          <path class="muscle" id="rhomboid-left" data-muscle="back" d="
+            M78 110
+            Q72 118 70 135
+            L70 160
+            Q72 175 78 182
+            L88 185
+            Q95 183 98 175
+            L100 155
+            Q100 135 98 120
+            L95 112
+            Q90 108 85 108
+            Z
+          "/>
+          <path class="muscle" id="rhomboid-right" data-muscle="back" d="
+            M122 110
+            Q128 118 130 135
+            L130 160
+            Q128 175 122 182
+            L112 185
+            Q105 183 102 175
+            L100 155
+            Q100 135 102 120
+            L105 112
+            Q110 108 115 108
+            Z
+          "/>
 
-          <!-- Calves -->
-          <ellipse cx="72" cy="375" rx="16" ry="38" class="muscle" data-muscle="calves" data-name="Calves"/>
-          <ellipse cx="128" cy="375" rx="16" ry="38" class="muscle" data-muscle="calves" data-name="Calves"/>
-        </svg>
+          <!-- TRICEPS -->
+          <path class="muscle" id="tricep-left" data-muscle="arms" d="
+            M30 130
+            Q22 138 20 155
+            L18 180
+            Q18 198 24 208
+            L32 212
+            Q40 210 44 200
+            L46 180
+            Q47 160 45 145
+            L42 135
+            Q38 128 35 128
+            Z
+          "/>
+          <path class="muscle" id="tricep-right" data-muscle="arms" d="
+            M170 130
+            Q178 138 180 155
+            L182 180
+            Q182 198 176 208
+            L168 212
+            Q160 210 156 200
+            L154 180
+            Q153 160 155 145
+            L158 135
+            Q162 128 165 128
+            Z
+          "/>
+
+          <!-- LOWER BACK / ERECTOR SPINAE -->
+          <path class="muscle" id="lower-back-left" data-muscle="back" d="
+            M75 188
+            Q68 200 65 220
+            L63 245
+            Q65 260 72 270
+            L82 272
+            Q90 270 95 260
+            L97 240
+            Q98 218 95 198
+            L92 190
+            Q88 185 82 185
+            Z
+          "/>
+          <path class="muscle" id="lower-back-right" data-muscle="back" d="
+            M125 188
+            Q132 200 135 220
+            L137 245
+            Q135 260 128 270
+            L118 272
+            Q110 270 105 260
+            L103 240
+            Q102 218 105 198
+            L108 190
+            Q112 185 118 185
+            Z
+          "/>
+
+          <!-- GLUTES -->
+          <path class="muscle" id="glute-left" data-muscle="legs" d="
+            M55 255
+            Q48 265 45 285
+            L45 305
+            Q48 320 58 328
+            L72 330
+            Q82 328 88 318
+            L90 300
+            Q90 280 85 265
+            L80 258
+            Q72 252 62 252
+            Z
+          "/>
+          <path class="muscle" id="glute-right" data-muscle="legs" d="
+            M145 255
+            Q152 265 155 285
+            L155 305
+            Q152 320 142 328
+            L128 330
+            Q118 328 112 318
+            L110 300
+            Q110 280 115 265
+            L120 258
+            Q128 252 138 252
+            Z
+          "/>
+
+          <!-- HAMSTRINGS -->
+          <path class="muscle" id="hamstring-left" data-muscle="legs" d="
+            M52 330
+            Q48 345 47 370
+            L47 400
+            Q48 425 52 445
+            L58 455
+            Q65 458 72 455
+            L78 445
+            Q82 425 82 400
+            L82 370
+            Q80 345 75 332
+            Z
+          "/>
+          <path class="muscle" id="hamstring-right" data-muscle="legs" d="
+            M148 330
+            Q152 345 153 370
+            L153 400
+            Q152 425 148 445
+            L142 455
+            Q135 458 128 455
+            L122 445
+            Q118 425 118 400
+            L118 370
+            Q120 345 125 332
+            Z
+          "/>
+
+          <!-- CALVES -->
+          <path class="muscle" id="calf-left" data-muscle="legs" d="
+            M50 458
+            Q47 475 47 495
+            L48 520
+            Q50 538 55 548
+            L62 550
+            Q68 548 72 538
+            L74 520
+            Q75 500 73 480
+            L70 465
+            Q66 458 58 458
+            Z
+          "/>
+          <path class="muscle" id="calf-right" data-muscle="legs" d="
+            M150 458
+            Q153 475 153 495
+            L152 520
+            Q150 538 145 548
+            L138 550
+            Q132 548 128 538
+            L126 520
+            Q125 500 127 480
+            L130 465
+            Q134 458 142 458
+            Z
+          "/>
+        </g>
+
+        <!-- Spine line -->
+        <g fill="none" stroke="var(--muscle-outline)" stroke-width="0.5" opacity="0.6">
+          <line x1="100" y1="70" x2="100" y2="270"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot default"></div>
+        <span>Tap to select</span>
       </div>
+      <div class="legend-item">
+        <div class="legend-dot active"></div>
+        <span>Selected</span>
+      </div>
+    </div>
 
-      <p class="instructions">Tap a muscle group to see exercises</p>
+    <!-- Instructions -->
+    <p class="instructions">Tap on any muscle to see details and exercises</p>
 
-      <!-- Muscle Info Panel -->
-      <div class="muscle-panel hidden" id="musclePanel">
-        <div class="panel-header">
-          <span class="panel-title" id="panelTitle">Chest</span>
-          <span class="panel-badge" id="panelBadge">2 heads</span>
+    <!-- Muscle Info Panel -->
+    <div class="muscle-info" id="muscleInfo">
+      <h2 id="muscleName">Chest</h2>
+      <p class="subtitle" id="muscleLatinName">Pectoralis Major</p>
+
+      <div class="info-section">
+        <h3>Muscle Heads</h3>
+        <div class="muscle-parts" id="muscleParts">
+          <span class="muscle-part">Upper (Clavicular)</span>
+          <span class="muscle-part">Middle (Sternal)</span>
+          <span class="muscle-part">Lower (Costal)</span>
         </div>
+      </div>
 
-        <div class="panel-section">
-          <div class="section-label">Muscle Parts</div>
-          <div class="sub-parts" id="subParts">
-            <!-- Filled dynamically -->
+      <div class="info-section">
+        <h3>Best Exercises</h3>
+        <div class="exercise-list" id="exerciseList">
+          <div class="exercise-item">
+            <div class="exercise-icon">🏋️</div>
+            <div class="exercise-details">
+              <h4>Bench Press</h4>
+              <p>Targets all three heads</p>
+            </div>
           </div>
         </div>
-
-        <div class="panel-section">
-          <div class="section-label">Best Exercises</div>
-          <div class="exercise-list" id="exerciseList">
-            <!-- Filled dynamically -->
-          </div>
-        </div>
       </div>
-
-      <!-- Stats -->
-      <div class="stats-bar">
-        <div class="stat-item">
-          <div class="stat-value">6</div>
-          <div class="stat-label">Groups</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">25</div>
-          <div class="stat-label">Exercises</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">15</div>
-          <div class="stat-label">Muscles</div>
-        </div>
-      </div>
-    </main>
+    </div>
   </div>
 
   <script>
     // Muscle data
     const muscleData = {
-      shoulders: {
-        name: 'Deltoids',
-        badge: '3 heads',
-        parts: ['Anterior (Front)', 'Lateral (Side)', 'Posterior (Rear)'],
+      chest: {
+        name: 'Chest',
+        latinName: 'Pectoralis Major',
+        parts: ['Upper (Clavicular)', 'Middle (Sternal)', 'Lower (Costal)'],
         exercises: [
-          { name: 'Shoulder Press', tag: 'All heads' },
-          { name: 'Lateral Raise', tag: 'Lateral' },
-          { name: 'Front Raise', tag: 'Anterior' },
-          { name: 'Reverse Fly', tag: 'Posterior' }
+          { name: 'Bench Press', target: 'All heads', icon: '🏋️' },
+          { name: 'Incline Press', target: 'Upper chest', icon: '📐' },
+          { name: 'Cable Flyes', target: 'Inner chest', icon: '🔗' }
         ]
       },
-      chest: {
-        name: 'Pectorals',
-        badge: '2 parts',
-        parts: ['Upper (Clavicular)', 'Lower (Sternal)'],
+      shoulders: {
+        name: 'Shoulders',
+        latinName: 'Deltoideus',
+        parts: ['Anterior (Front)', 'Lateral (Side)', 'Posterior (Rear)'],
         exercises: [
-          { name: 'Bench Press', tag: 'Primary' },
-          { name: 'Incline Press', tag: 'Upper' },
-          { name: 'Cable Fly', tag: 'Inner' },
-          { name: 'Dips', tag: 'Lower' }
+          { name: 'Overhead Press', target: 'All heads', icon: '🏋️' },
+          { name: 'Lateral Raises', target: 'Side delts', icon: '↔️' },
+          { name: 'Face Pulls', target: 'Rear delts', icon: '🎯' }
         ]
       },
       arms: {
         name: 'Arms',
-        badge: '5 muscles',
-        parts: ['Biceps Long Head', 'Biceps Short Head', 'Triceps Long', 'Triceps Lateral', 'Triceps Medial'],
+        latinName: 'Biceps Brachii & Triceps Brachii',
+        parts: ['Biceps Long Head', 'Biceps Short Head', 'Triceps Long Head', 'Triceps Lateral Head', 'Triceps Medial Head'],
         exercises: [
-          { name: 'Barbell Curl', tag: 'Biceps' },
-          { name: 'Tricep Pushdown', tag: 'Triceps' },
-          { name: 'Hammer Curl', tag: 'Brachialis' },
-          { name: 'Skull Crushers', tag: 'Triceps Long' }
+          { name: 'Barbell Curl', target: 'Biceps', icon: '💪' },
+          { name: 'Tricep Dips', target: 'Triceps', icon: '⬇️' },
+          { name: 'Hammer Curls', target: 'Brachialis', icon: '🔨' }
         ]
       },
       core: {
         name: 'Core',
-        badge: '4 muscles',
-        parts: ['Rectus Abdominis', 'Obliques', 'Transverse Abs', 'Serratus'],
+        latinName: 'Rectus Abdominis & Obliques',
+        parts: ['Upper Abs', 'Lower Abs', 'External Obliques', 'Internal Obliques', 'Transverse Abdominis'],
         exercises: [
-          { name: 'Crunches', tag: 'Upper Abs' },
-          { name: 'Leg Raises', tag: 'Lower Abs' },
-          { name: 'Russian Twist', tag: 'Obliques' },
-          { name: 'Plank', tag: 'All Core' }
-        ]
-      },
-      back: {
-        name: 'Back',
-        badge: '5 muscles',
-        parts: ['Latissimus Dorsi', 'Rhomboids', 'Trapezius', 'Erector Spinae', 'Teres Major'],
-        exercises: [
-          { name: 'Lat Pulldown', tag: 'Lats' },
-          { name: 'Barbell Row', tag: 'Mid Back' },
-          { name: 'Deadlift', tag: 'Erectors' },
-          { name: 'Face Pull', tag: 'Rear Delts/Traps' }
+          { name: 'Hanging Leg Raises', target: 'Lower abs', icon: '🦵' },
+          { name: 'Cable Crunches', target: 'Upper abs', icon: '🔗' },
+          { name: 'Russian Twists', target: 'Obliques', icon: '🔄' }
         ]
       },
       legs: {
         name: 'Legs',
-        badge: '6 muscles',
-        parts: ['Quadriceps', 'Hamstrings', 'Adductors', 'Abductors'],
+        latinName: 'Quadriceps, Hamstrings & Gluteus',
+        parts: ['Quadriceps (4 heads)', 'Hamstrings (3 muscles)', 'Gluteus Maximus', 'Adductors', 'Calves'],
         exercises: [
-          { name: 'Squat', tag: 'Quads/Glutes' },
-          { name: 'Romanian Deadlift', tag: 'Hamstrings' },
-          { name: 'Leg Press', tag: 'Quads' },
-          { name: 'Leg Curl', tag: 'Hamstrings' }
+          { name: 'Squats', target: 'Quads & Glutes', icon: '🏋️' },
+          { name: 'Romanian Deadlift', target: 'Hamstrings', icon: '🔻' },
+          { name: 'Leg Press', target: 'All leg muscles', icon: '🦵' }
         ]
       },
-      glutes: {
-        name: 'Glutes',
-        badge: '3 muscles',
-        parts: ['Gluteus Maximus', 'Gluteus Medius', 'Gluteus Minimus'],
+      back: {
+        name: 'Back',
+        latinName: 'Latissimus Dorsi, Trapezius & Rhomboids',
+        parts: ['Lats', 'Upper Traps', 'Middle Traps', 'Lower Traps', 'Rhomboids', 'Erector Spinae'],
         exercises: [
-          { name: 'Hip Thrust', tag: 'Glute Max' },
-          { name: 'Bulgarian Split Squat', tag: 'All Glutes' },
-          { name: 'Cable Kickback', tag: 'Glute Max' },
-          { name: 'Clamshell', tag: 'Glute Med' }
-        ]
-      },
-      calves: {
-        name: 'Calves',
-        badge: '2 muscles',
-        parts: ['Gastrocnemius', 'Soleus'],
-        exercises: [
-          { name: 'Standing Calf Raise', tag: 'Gastrocnemius' },
-          { name: 'Seated Calf Raise', tag: 'Soleus' }
-        ]
-      },
-      forearms: {
-        name: 'Forearms',
-        badge: '2 groups',
-        parts: ['Flexors', 'Extensors'],
-        exercises: [
-          { name: 'Wrist Curl', tag: 'Flexors' },
-          { name: 'Reverse Curl', tag: 'Extensors' },
-          { name: 'Farmer Walk', tag: 'Grip' }
+          { name: 'Pull-ups', target: 'Lats', icon: '⬆️' },
+          { name: 'Barbell Rows', target: 'Mid back', icon: '🚣' },
+          { name: 'Deadlift', target: 'Entire back', icon: '🏋️' }
         ]
       }
     };
 
-    // Theme toggle
+    // DOM elements
+    const frontView = document.getElementById('frontView');
+    const backView = document.getElementById('backView');
+    const muscleInfo = document.getElementById('muscleInfo');
+    const viewBtns = document.querySelectorAll('.view-btn');
     const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    let isDark = false;
 
+    let selectedMuscle = null;
+    let currentView = 'front';
+
+    // Theme toggle
     themeToggle.addEventListener('click', () => {
-      isDark = !isDark;
-      document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
-      themeIcon.innerHTML = isDark
-        ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
-        : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+      document.body.classList.toggle('dark');
+      themeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
     });
 
     // View toggle
-    const viewBtns = document.querySelectorAll('.view-btn');
-    const frontView = document.getElementById('frontView');
-    const backView = document.getElementById('backView');
-
     viewBtns.forEach(btn => {
       btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        if (view === currentView) return;
+
+        currentView = view;
         viewBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
-        if (btn.dataset.view === 'front') {
+        if (view === 'front') {
           frontView.style.display = 'block';
           backView.style.display = 'none';
         } else {
@@ -612,60 +1223,72 @@
           backView.style.display = 'block';
         }
 
-        // Clear selection
-        document.querySelectorAll('.muscle.active').forEach(m => m.classList.remove('active'));
-        document.getElementById('musclePanel').classList.add('hidden');
+        // Clear selection when switching views
+        clearSelection();
       });
     });
 
     // Muscle click handling
-    const muscles = document.querySelectorAll('.muscle');
-    const panel = document.getElementById('musclePanel');
-    const panelTitle = document.getElementById('panelTitle');
-    const panelBadge = document.getElementById('panelBadge');
-    const subParts = document.getElementById('subParts');
-    const exerciseList = document.getElementById('exerciseList');
+    document.querySelectorAll('.muscle').forEach(muscle => {
+      muscle.addEventListener('click', (e) => {
+        const muscleType = e.target.dataset.muscle;
 
-    muscles.forEach(muscle => {
-      muscle.addEventListener('click', () => {
-        const muscleId = muscle.dataset.muscle;
-        const data = muscleData[muscleId];
-
-        if (!data) return;
-
-        // Toggle active state
-        const wasActive = muscle.classList.contains('active');
-        muscles.forEach(m => m.classList.remove('active'));
-
-        if (wasActive) {
-          panel.classList.add('hidden');
-          return;
-        }
-
-        // Activate all muscles of the same group
-        muscles.forEach(m => {
-          if (m.dataset.muscle === muscleId) {
-            m.classList.add('active');
-          }
+        // Clear previous selection
+        document.querySelectorAll('.muscle.selected').forEach(m => {
+          m.classList.remove('selected');
         });
 
-        // Update panel
-        panelTitle.textContent = data.name;
-        panelBadge.textContent = data.badge;
+        // Select all muscles of this type
+        document.querySelectorAll(`[data-muscle="${muscleType}"]`).forEach(m => {
+          m.classList.add('selected');
+        });
 
-        subParts.innerHTML = data.parts.map(part =>
-          `<span class="sub-part">${part}</span>`
-        ).join('');
-
-        exerciseList.innerHTML = data.exercises.map(ex =>
-          `<div class="exercise-item">
-            <span class="exercise-name">${ex.name}</span>
-            <span class="exercise-tag">${ex.tag}</span>
-          </div>`
-        ).join('');
-
-        panel.classList.remove('hidden');
+        selectedMuscle = muscleType;
+        showMuscleInfo(muscleType);
       });
+    });
+
+    function clearSelection() {
+      document.querySelectorAll('.muscle.selected').forEach(m => {
+        m.classList.remove('selected');
+      });
+      muscleInfo.classList.remove('visible');
+      selectedMuscle = null;
+    }
+
+    function showMuscleInfo(muscleType) {
+      const data = muscleData[muscleType];
+      if (!data) return;
+
+      document.getElementById('muscleName').textContent = data.name;
+      document.getElementById('muscleLatinName').textContent = data.latinName;
+
+      // Parts
+      const partsContainer = document.getElementById('muscleParts');
+      partsContainer.innerHTML = data.parts.map(part =>
+        `<span class="muscle-part">${part}</span>`
+      ).join('');
+
+      // Exercises
+      const exerciseList = document.getElementById('exerciseList');
+      exerciseList.innerHTML = data.exercises.map(ex => `
+        <div class="exercise-item">
+          <div class="exercise-icon">${ex.icon}</div>
+          <div class="exercise-details">
+            <h4>${ex.name}</h4>
+            <p>${ex.target}</p>
+          </div>
+        </div>
+      `).join('');
+
+      muscleInfo.classList.add('visible');
+    }
+
+    // Click outside to deselect
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.muscle') && !e.target.closest('.muscle-info')) {
+        clearSelection();
+      }
     });
   </script>
 </body>
