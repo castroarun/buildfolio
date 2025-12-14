@@ -18,11 +18,10 @@ const CONFIG = {
   maxSessionMinutes: 480, // Cap single session at 8hrs
   minSessionMinutes: 5,   // Ignore sessions < 5min
   firstCommitBufferMinutes: 30, // Assume work started 30min before first commit
-  devClockPath: 'docs/DEV-CLOCK.md', // Default location
+  devClockPath: 'strength_profile_tracker/docs/DEV-CLOCK.md',
 
-  // Project path filter - leave empty to track entire repo
-  // Set to a path like 'my-project/' for monorepo setups
-  projectPath: '',
+  // Project path filter - set for monorepo setups
+  projectPath: 'strength_profile_tracker',
 
   // Phase detection from commit prefixes
   phases: {
