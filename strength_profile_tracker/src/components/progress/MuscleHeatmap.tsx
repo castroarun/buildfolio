@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Exercise, WorkoutSession, Profile } from '@/types'
 
 interface MuscleHeatmapProps {
@@ -196,35 +196,37 @@ const MALE_BACK_PATHS = {
 }
 
 // Map exercises to muscle slugs used in the SVG paths
-const EXERCISE_MUSCLES: Record<Exercise, { primary: string[]; secondary: string[] }> = {
+const EXERCISE_MUSCLES: Partial<Record<Exercise, { primary: string[]; secondary: string[] }>> = {
   // Chest
-  'bench_press': { primary: ['chest'], secondary: ['triceps', 'deltoids'] },
-  'incline_bench_press': { primary: ['chest'], secondary: ['triceps', 'deltoids'] },
-  'dumbbell_fly': { primary: ['chest'], secondary: [] },
-  'cable_crossover': { primary: ['chest'], secondary: [] },
-  'push_up': { primary: ['chest'], secondary: ['triceps', 'deltoids'] },
+  benchPress: { primary: ['chest'], secondary: ['triceps', 'deltoids'] },
+  inclineBench: { primary: ['chest'], secondary: ['triceps', 'deltoids'] },
+  dumbbellPress: { primary: ['chest'], secondary: ['triceps', 'deltoids'] },
+  cableFly: { primary: ['chest'], secondary: [] },
   // Back
-  'deadlift': { primary: ['lower-back', 'gluteal', 'hamstring'], secondary: ['trapezius', 'forearm'] },
-  'barbell_row': { primary: ['upper-back'], secondary: ['biceps'] },
-  'pull_up': { primary: ['upper-back'], secondary: ['biceps', 'forearm'] },
-  'lat_pulldown': { primary: ['upper-back'], secondary: ['biceps'] },
-  'seated_cable_row': { primary: ['upper-back'], secondary: ['biceps'] },
+  deadlift: { primary: ['lower-back', 'gluteal', 'hamstring'], secondary: ['trapezius', 'forearm'] },
+  barbellRow: { primary: ['upper-back'], secondary: ['biceps'] },
+  pullUps: { primary: ['upper-back'], secondary: ['biceps', 'forearm'] },
+  latPulldown: { primary: ['upper-back'], secondary: ['biceps'] },
+  cableRow: { primary: ['upper-back'], secondary: ['biceps'] },
   // Shoulders
-  'overhead_press': { primary: ['deltoids'], secondary: ['triceps', 'trapezius'] },
-  'lateral_raise': { primary: ['deltoids'], secondary: [] },
-  'front_raise': { primary: ['deltoids'], secondary: [] },
-  'rear_delt_fly': { primary: ['deltoids', 'upper-back'], secondary: [] },
-  'face_pull': { primary: ['deltoids', 'upper-back'], secondary: ['trapezius'] },
+  shoulderPressBarbell: { primary: ['deltoids'], secondary: ['triceps', 'trapezius'] },
+  shoulderPressMachine: { primary: ['deltoids'], secondary: ['triceps', 'trapezius'] },
+  shoulderPressDumbbell: { primary: ['deltoids'], secondary: ['triceps', 'trapezius'] },
+  sideLateralDumbbell: { primary: ['deltoids'], secondary: [] },
+  sideLateralCable: { primary: ['deltoids'], secondary: [] },
+  frontRaise: { primary: ['deltoids'], secondary: [] },
   // Legs
-  'squat': { primary: ['quadriceps', 'gluteal'], secondary: ['hamstring', 'lower-back'] },
-  'leg_press': { primary: ['quadriceps', 'gluteal'], secondary: ['hamstring'] },
-  'leg_extension': { primary: ['quadriceps'], secondary: [] },
-  'leg_curl': { primary: ['hamstring'], secondary: [] },
-  'calf_raise': { primary: ['calves'], secondary: [] },
+  squat: { primary: ['quadriceps', 'gluteal'], secondary: ['hamstring', 'lower-back'] },
+  legPress: { primary: ['quadriceps', 'gluteal'], secondary: ['hamstring'] },
+  romanianDeadlift: { primary: ['hamstring', 'gluteal'], secondary: ['lower-back'] },
+  legExtension: { primary: ['quadriceps'], secondary: [] },
+  legCurl: { primary: ['hamstring'], secondary: [] },
+  calfRaise: { primary: ['calves'], secondary: [] },
   // Arms
-  'barbell_curl': { primary: ['biceps'], secondary: ['forearm'] },
-  'tricep_pushdown': { primary: ['triceps'], secondary: [] },
-  'hammer_curl': { primary: ['biceps', 'forearm'], secondary: [] },
+  bicepCurlBarbell: { primary: ['biceps'], secondary: ['forearm'] },
+  bicepCurlDumbbell: { primary: ['biceps'], secondary: ['forearm'] },
+  tricepPushdown: { primary: ['triceps'], secondary: [] },
+  skullCrushers: { primary: ['triceps'], secondary: [] },
 }
 
 // Muscle groups for display list
@@ -259,7 +261,7 @@ function renderBodyPart(
 ) {
   if (!bodyPart) return null
 
-  const paths: JSX.Element[] = []
+  const paths: React.ReactElement[] = []
 
   if (bodyPart.common) {
     bodyPart.common.forEach((d, i) => (

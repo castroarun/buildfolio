@@ -1,5 +1,6 @@
-import { Exercise, WorkoutSession, WorkoutSet, Level, ExerciseInfo, Sex } from '@/types'
+import { Exercise, WorkoutSession, WorkoutSet, Level, Sex } from '@/types'
 import { getExerciseById, calculateStrength } from '@/lib/calculations/strength'
+import { addToSyncQueue } from './sync'
 
 const WORKOUTS_KEY = 'strength_profile_workouts'
 
@@ -191,13 +192,19 @@ export function saveWorkoutSession(
     sets
   }
 
-  if (existingIndex >= 0) {
+  const isUpdate = existingIndex >= 0
+
+  if (isUpdate) {
     allWorkouts[existingIndex] = session
   } else {
     allWorkouts.push(session)
   }
 
   saveWorkouts(allWorkouts)
+
+  // Queue for cloud sync
+  addToSyncQueue('workout', isUpdate ? 'update' : 'create', session)
+
   return session
 }
 

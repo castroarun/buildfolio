@@ -1,23 +1,93 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Profile, VALIDATION } from '@/types'
-import { getProfiles } from '@/lib/storage/profiles'
+import { getProfiles, getProfileById, syncProfilesFromCloud } from '@/lib/storage/profiles'
 import { loadSampleData, hasSampleData, removeSampleData } from '@/lib/storage/seedData'
+import { setupSyncListeners, hasPendingSync, processSyncQueue } from '@/lib/storage/sync'
 import { ProfileCard, EmptyProfileSlot } from '@/components/profile'
 import { MotivationalQuote } from '@/components/quotes'
-import { ThemeToggle, UnitToggle } from '@/components/ui'
+import { ThemeToggle, UnitToggle, Logo } from '@/components/ui'
+import { LoginScreen } from '@/components/auth'
+import { useAuth } from '@/contexts'
 
 export default function HomePage() {
+  const router = useRouter()
+  const { user, isLoading: authLoading, isConfigured } = useAuth()
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [hasSamples, setHasSamples] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
 
+  // Setup sync listeners
   useEffect(() => {
+    const cleanup = setupSyncListeners()
+    return cleanup
+  }, [])
+
+  // Sync on auth or when coming online
+  useEffect(() => {
+    if (user && isConfigured) {
+      handleSync()
+    }
+  }, [user, isConfigured])
+
+  // Load profiles
+  useEffect(() => {
+    if (authLoading) return
+
+    // Check if first-time user without account
+    const hasSkippedLogin = localStorage.getItem('skippedLogin')
+    if (!user && isConfigured && !hasSkippedLogin) {
+      setShowLogin(true)
+      setIsLoading(false)
+      return
+    }
+
+    // Check for last visited profile and redirect if it still exists
+    const lastVisitedProfileId = localStorage.getItem('lastVisitedProfile')
+    if (lastVisitedProfileId) {
+      const lastProfile = getProfileById(lastVisitedProfileId)
+      if (lastProfile) {
+        router.push(`/profile/${lastVisitedProfileId}`)
+        return
+      } else {
+        // Profile was deleted, clear the saved preference
+        localStorage.removeItem('lastVisitedProfile')
+      }
+    }
+
     setProfiles(getProfiles())
     setHasSamples(hasSampleData())
     setIsLoading(false)
-  }, [])
+  }, [router, authLoading, user, isConfigured])
+
+  const handleSync = async () => {
+    setIsSyncing(true)
+    try {
+      // Push pending changes first
+      if (hasPendingSync()) {
+        await processSyncQueue()
+      }
+      // Then pull from cloud
+      await syncProfilesFromCloud()
+      setProfiles(getProfiles())
+    } catch (error) {
+      console.error('Sync failed:', error)
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
+  const handleSkipLogin = () => {
+    localStorage.setItem('skippedLogin', 'true')
+    setShowLogin(false)
+    setProfiles(getProfiles())
+    setHasSamples(hasSampleData())
+  }
 
   const handleLoadSampleData = () => {
     loadSampleData()
@@ -33,7 +103,12 @@ export default function HomePage() {
 
   const emptySlots = VALIDATION.maxProfiles - profiles.length
 
-  if (isLoading) {
+  // Show login screen for first-time users
+  if (showLogin) {
+    return <LoginScreen onSkip={handleSkipLogin} />
+  }
+
+  if (isLoading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500">Loading...</div>
@@ -47,17 +122,40 @@ export default function HomePage() {
       <header className="bg-[#2C3E50] text-white px-4 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-semibold">Strength Profiles</h1>
+            <Logo size="md" />
             <p className="text-sm text-gray-300 mt-1">
               {profiles.length} of {VALIDATION.maxProfiles} profiles
+              {isSyncing && <span className="ml-2">• Syncing...</span>}
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              href="/settings"
+              className="p-2 text-white/80 hover:text-white transition-colors"
+              title="Settings"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </Link>
             <UnitToggle />
             <ThemeToggle />
           </div>
         </div>
       </header>
+
+      {/* Sync Status Banner */}
+      {!user && isConfigured && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-2">
+          <p className="text-sm text-amber-700 dark:text-amber-300 text-center">
+            <Link href="/settings" className="underline hover:no-underline">
+              Sign in
+            </Link>
+            {' '}to sync your data across devices
+          </p>
+        </div>
+      )}
 
       {/* Content */}
       <main className="p-4 max-w-lg mx-auto">
@@ -109,7 +207,7 @@ export default function HomePage() {
         </div>
 
         {/* Sample Data Button */}
-        <div className="mt-6 text-center">
+        <div className="mt-32 text-center">
           {!hasSamples ? (
             <button
               onClick={handleLoadSampleData}

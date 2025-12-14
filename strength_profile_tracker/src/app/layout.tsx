@@ -1,10 +1,21 @@
 import type { Metadata, Viewport } from 'next'
-import { ThemeProvider, UnitProvider } from '@/contexts'
+import { ThemeProvider, UnitProvider, AuthProvider } from '@/contexts'
+import PWAInitializer from '@/components/pwa/PWAInitializer'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Strength Profile Tracker',
-  description: 'Track your strength standards and progress across key compound lifts'
+  title: 'REPPIT - Strength Tracker',
+  description: 'Track your reps, build your strength. Progress tracking for compound lifts.',
+  applicationName: 'REPPIT',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'REPPIT'
+  },
+  other: {
+    'mobile-web-app-capable': 'yes'
+  }
 }
 
 export const viewport: Viewport = {
@@ -20,12 +31,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-gray-50 dark:bg-gray-900 min-h-screen antialiased transition-colors" suppressHydrationWarning>
-        <ThemeProvider>
-          <UnitProvider>
-            {children}
-          </UnitProvider>
-        </ThemeProvider>
+      <body className="min-h-screen antialiased transition-colors workout-bg" suppressHydrationWarning>
+        <PWAInitializer />
+        <AuthProvider>
+          <ThemeProvider>
+            <UnitProvider>
+              {children}
+            </UnitProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   )

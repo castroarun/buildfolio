@@ -107,3 +107,37 @@ html {
     padding-right: max(0px, env(safe-area-inset-right));
   }
 }
+
+/* Workout background ambience */
+.workout-bg {
+  position: relative;
+  /* Background image directly on body - works on mobile */
+  background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+}
+
+/* Overlay to control opacity and add dark tint */
+.workout-bg::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(249, 250, 251, 0.92); /* Light mode overlay */
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark .workout-bg::before {
+  background-color: rgba(17, 24, 39, 0.88); /* Dark mode overlay - lets more image show */
+}
+
+/* Ensure content appears above the overlay */
+.workout-bg > * {
+  position: relative;
+  z-index: 1;
+}
