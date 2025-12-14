@@ -8,7 +8,6 @@ import { getProfiles, getProfileById, syncProfilesFromCloud } from '@/lib/storag
 import { loadSampleData, hasSampleData, removeSampleData } from '@/lib/storage/seedData'
 import { setupSyncListeners, hasPendingSync, processSyncQueue } from '@/lib/storage/sync'
 import { ProfileCard, EmptyProfileSlot } from '@/components/profile'
-import { MotivationalQuote } from '@/components/quotes'
 import { ThemeToggle, UnitToggle, Logo } from '@/components/ui'
 import { LoginScreen } from '@/components/auth'
 import { useAuth } from '@/contexts'
@@ -201,13 +200,8 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Motivational Quote */}
-        <div className="mt-6">
-          <MotivationalQuote />
-        </div>
-
         {/* Sample Data Button */}
-        <div className="mt-32 text-center">
+        <div className="mt-8 text-center">
           {!hasSamples ? (
             <button
               onClick={handleLoadSampleData}

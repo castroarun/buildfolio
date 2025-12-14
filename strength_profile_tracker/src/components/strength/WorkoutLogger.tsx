@@ -273,7 +273,7 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
       )}
 
       {/* Workout columns - horizontally scrollable */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-visible">
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-visible touch-pan-x" style={{ WebkitOverflowScrolling: 'touch' }}>
         {/* Set labels column */}
         <div className="flex flex-col gap-1 flex-shrink-0">
           <div className="h-8"></div>

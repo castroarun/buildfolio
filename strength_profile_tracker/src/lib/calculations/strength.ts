@@ -416,13 +416,94 @@ export interface CoachTip {
 }
 
 /**
+ * Calculate body part level averages for balance analysis
+ */
+export function calculateBodyPartLevels(ratings: ExerciseRatings): Record<BodyPart, number> {
+  const bodyPartLevels: Record<BodyPart, number[]> = {
+    chest: [], back: [], shoulders: [], legs: [], arms: [], core: []
+  }
+
+  Object.entries(ratings).forEach(([exerciseId, level]) => {
+    if (level) {
+      const exercise = EXERCISES.find(e => e.id === exerciseId)
+      if (exercise) {
+        bodyPartLevels[exercise.bodyPart].push(LEVEL_VALUES[level])
+      }
+    }
+  })
+
+  const averages: Record<BodyPart, number> = {
+    chest: 0, back: 0, shoulders: 0, legs: 0, arms: 0, core: 0
+  }
+
+  Object.entries(bodyPartLevels).forEach(([bp, levels]) => {
+    if (levels.length > 0) {
+      averages[bp as BodyPart] = levels.reduce((a, b) => a + b, 0) / levels.length
+    }
+  })
+
+  return averages
+}
+
+/**
+ * Find weak body parts (below average level)
+ */
+export function findWeakBodyParts(ratings: ExerciseRatings): { name: string; level: number; avgLevel: number }[] {
+  const bodyPartLevels = calculateBodyPartLevels(ratings)
+  const mainBodyParts: BodyPart[] = ['chest', 'back', 'shoulders', 'legs', 'arms']
+
+  // Get body parts that have been rated
+  const ratedBodyParts = mainBodyParts.filter(bp => bodyPartLevels[bp] > 0)
+  if (ratedBodyParts.length < 2) return [] // Need at least 2 body parts to compare
+
+  // Calculate average across all rated body parts
+  const totalLevel = ratedBodyParts.reduce((sum, bp) => sum + bodyPartLevels[bp], 0)
+  const avgLevel = totalLevel / ratedBodyParts.length
+
+  // Find body parts significantly below average (more than 0.5 level difference)
+  const weakParts = ratedBodyParts
+    .filter(bp => bodyPartLevels[bp] < avgLevel - 0.3)
+    .map(bp => ({
+      name: bp.charAt(0).toUpperCase() + bp.slice(1),
+      level: bodyPartLevels[bp],
+      avgLevel
+    }))
+    .sort((a, b) => a.level - b.level) // Weakest first
+
+  return weakParts
+}
+
+/**
  * Generate contextual AI Coach tips based on user's ratings
+ * PRIORITY: Body part imbalances > Progress advice > Generic encouragement
  */
 export function generateCoachTips(ratings: ExerciseRatings): CoachTip[] {
   const tips: CoachTip[] = []
   const ratedLevels = Object.values(ratings).filter((l): l is Level => l !== undefined)
   const ratedCount = ratedLevels.length
   const strengthScore = calculateStrengthScore(ratings)
+
+  // Tip 1: New user encouragement (highest priority for new users)
+  if (ratedCount === 0) {
+    tips.push({
+      type: 'encouragement',
+      message: "Welcome! Start by rating a few exercises you regularly perform. Even 4-5 exercises is a great start!",
+      icon: '👋'
+    })
+    return tips
+  }
+
+  // PRIORITY TIP: Body part imbalances (weak body parts)
+  const weakBodyParts = findWeakBodyParts(ratings)
+  if (weakBodyParts.length > 0) {
+    const weakest = weakBodyParts[0]
+    const levelName = weakest.level <= 1.5 ? 'beginner' : weakest.level <= 2.5 ? 'novice' : 'intermediate'
+    tips.push({
+      type: 'balance',
+      message: `Weak ${weakest.name.toLowerCase()}: Focus on ${weakest.name.toLowerCase()} exercises to balance your strength profile.`,
+      icon: '⚖️'
+    })
+  }
 
   // Count levels
   const levelCounts = {
@@ -446,19 +527,7 @@ export function generateCoachTips(ratings: ExerciseRatings): CoachTip[] {
     }
   })
 
-  // Generate tips based on profile state
-
-  // Tip 1: New user encouragement
-  if (ratedCount === 0) {
-    tips.push({
-      type: 'encouragement',
-      message: "Welcome! Start by rating a few exercises you regularly perform. Even 4-5 exercises is a great start!",
-      icon: '👋'
-    })
-    return tips
-  }
-
-  // Tip 2: First achievement
+  // Tip 2: First achievement (if only 1 exercise rated)
   if (ratedCount === 1) {
     tips.push({
       type: 'achievement',
@@ -486,7 +555,7 @@ export function generateCoachTips(ratings: ExerciseRatings): CoachTip[] {
       message: "Impressive progress! To reach Advanced, focus on periodization and ensure adequate recovery.",
       icon: '🔥'
     })
-  } else if (levelCounts.advanced > 0) {
+  } else if (levelCounts.advanced > 0 && tips.length === 0) {
     tips.push({
       type: 'achievement',
       message: "Elite performance! Maintain your strength with consistent training and prioritize injury prevention.",
@@ -494,11 +563,11 @@ export function generateCoachTips(ratings: ExerciseRatings): CoachTip[] {
     })
   }
 
-  // Tip 4: Balance advice - check if any body part is neglected
+  // Tip 4: Balance advice - check if any body part is completely neglected
   const bodyPartsWithExercises = Object.entries(ratedByBodyPart)
     .filter(([, count]) => count > 0)
 
-  if (bodyPartsWithExercises.length > 0) {
+  if (bodyPartsWithExercises.length > 0 && tips.length < 2) {
     const exercisesPerBodyPart: Record<BodyPart, number> = {
       chest: 4, back: 5, shoulders: 6, legs: 6, arms: 4, core: 0
     }
@@ -517,31 +586,33 @@ export function generateCoachTips(ratings: ExerciseRatings): CoachTip[] {
     }
   }
 
-  // Tip 5: Score milestone encouragement
-  if (strengthScore > 0 && strengthScore < 50) {
-    tips.push({
-      type: 'encouragement',
-      message: `Score: ${strengthScore}/100. Keep training consistently and you'll see that number climb!`,
-      icon: '📊'
-    })
-  } else if (strengthScore >= 50 && strengthScore < 75) {
-    tips.push({
-      type: 'encouragement',
-      message: `Score: ${strengthScore}/100. You're past halfway! Strong foundation built.`,
-      icon: '⭐'
-    })
-  } else if (strengthScore >= 75 && strengthScore < 100) {
-    tips.push({
-      type: 'encouragement',
-      message: `Score: ${strengthScore}/100. Almost elite status! Keep pushing those limits.`,
-      icon: '🚀'
-    })
-  } else if (strengthScore === 100) {
-    tips.push({
-      type: 'achievement',
-      message: "Perfect 100! You've achieved Elite Status. You're in the top tier of strength!",
-      icon: '👑'
-    })
+  // Tip 5: Score milestone encouragement (lower priority)
+  if (tips.length < 2) {
+    if (strengthScore > 0 && strengthScore < 50) {
+      tips.push({
+        type: 'encouragement',
+        message: `Score: ${strengthScore}/100. Keep training consistently and you'll see that number climb!`,
+        icon: '📊'
+      })
+    } else if (strengthScore >= 50 && strengthScore < 75) {
+      tips.push({
+        type: 'encouragement',
+        message: `Score: ${strengthScore}/100. You're past halfway! Strong foundation built.`,
+        icon: '⭐'
+      })
+    } else if (strengthScore >= 75 && strengthScore < 100) {
+      tips.push({
+        type: 'encouragement',
+        message: `Score: ${strengthScore}/100. Almost elite status! Keep pushing those limits.`,
+        icon: '🚀'
+      })
+    } else if (strengthScore === 100) {
+      tips.push({
+        type: 'achievement',
+        message: "Perfect 100! You've achieved Elite Status. You're in the top tier of strength!",
+        icon: '👑'
+      })
+    }
   }
 
   // Return only first 2 tips to avoid overwhelming

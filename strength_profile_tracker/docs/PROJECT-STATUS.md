@@ -1,4 +1,7 @@
-# Strength Profile Tracker - Project Status
+# REPPIT - Project Status
+
+> **App Name:** REPPIT (formerly Strength Profile Tracker)
+> **Tagline:** Track your reps. Build your strength.
 
 **Last Updated:** 2025-12-13
 **Jira Board:** https://castroarun.atlassian.net/jira/software/projects/SPT/board

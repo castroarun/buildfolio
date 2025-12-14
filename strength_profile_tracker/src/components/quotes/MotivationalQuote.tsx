@@ -5,7 +5,7 @@ import { Quote } from '@/types'
 import { getDailyQuote, getRandomQuote } from '@/data/quotes'
 
 interface MotivationalQuoteProps {
-  variant?: 'daily' | 'random'
+  variant?: 'daily' | 'random' | 'compact'
 }
 
 export default function MotivationalQuote({ variant = 'daily' }: MotivationalQuoteProps) {
@@ -13,7 +13,7 @@ export default function MotivationalQuote({ variant = 'daily' }: MotivationalQuo
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
-    setQuote(variant === 'daily' ? getDailyQuote() : getRandomQuote())
+    setQuote(variant === 'random' ? getRandomQuote() : getDailyQuote())
   }, [variant])
 
   const handleRefresh = () => {
@@ -25,6 +25,15 @@ export default function MotivationalQuote({ variant = 'daily' }: MotivationalQuo
   }
 
   if (!quote) return null
+
+  // Compact variant for header - two lines max with smaller text
+  if (variant === 'compact') {
+    return (
+      <p className="text-[10px] text-white/80 italic leading-tight line-clamp-2">
+        "{quote.text}"
+      </p>
+    )
+  }
 
   return (
     <div className={`text-center py-4 transition-all duration-300 ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}>
