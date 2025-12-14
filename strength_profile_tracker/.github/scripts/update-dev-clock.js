@@ -12,17 +12,17 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// Configuration
+// Configuration - works automatically for any repo
 const CONFIG = {
   sessionGapMinutes: 120, // New session after 2hr gap
   maxSessionMinutes: 480, // Cap single session at 8hrs
   minSessionMinutes: 5,   // Ignore sessions < 5min
   firstCommitBufferMinutes: 30, // Assume work started 30min before first commit
-  devClockPath: 'strength_profile_tracker/docs/DEV-CLOCK.md',
+  devClockPath: 'docs/DEV-CLOCK.md', // Default location
 
-  // Project path filter - only count commits touching files in this path
-  // Set to null or '' to count all commits in repo
-  projectPath: 'strength_profile_tracker',
+  // Project path filter - leave empty to track entire repo
+  // Set to a path like 'my-project/' for monorepo setups
+  projectPath: '',
 
   // Phase detection from commit prefixes
   phases: {
@@ -34,6 +34,36 @@ const CONFIG = {
     'Shipping': ['deploy', 'release', 'version', 'publish', 'ci', 'cd', 'build:', 'chore']
   }
 };
+
+// Auto-detect project name from package.json or git remote
+function getProjectName() {
+  // Try package.json first
+  try {
+    const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+    if (pkg.name) {
+      return pkg.name
+        .split('/').pop()
+        .replace(/-|_/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+  } catch {}
+
+  // Try git remote
+  try {
+    const remote = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
+    const match = remote.match(/\/([^\/]+?)(\.git)?$/);
+    if (match) {
+      return match[1]
+        .replace(/-|_/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+  } catch {}
+
+  // Fallback to current directory name
+  return path.basename(process.cwd())
+    .replace(/-|_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
 
 function getCommitHistory() {
   try {
@@ -219,7 +249,7 @@ function aggregateByDay(sessions) {
   return dailyStats;
 }
 
-function generateMarkdown(sessions, phaseStats, dailyStats) {
+function generateMarkdown(sessions, phaseStats, dailyStats, projectName) {
   const totalHours = sessions.reduce((sum, s) => sum + s.durationHours, 0);
   const totalCommits = sessions.reduce((sum, s) => sum + s.commitCount, 0);
   const startDate = sessions[0]?.date || 'N/A';
@@ -243,14 +273,9 @@ function generateMarkdown(sessions, phaseStats, dailyStats) {
     'Shipping': 1.5
   };
 
-  const projectName = CONFIG.projectPath
-    ? CONFIG.projectPath.split('/').pop().replace(/-|_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-    : 'Project';
-
   let md = `# ${projectName} - DEV-CLOCK
 
 Time tracker for development phases. **Auto-updated from git commits.**
-${CONFIG.projectPath ? `\n> Project: \`${CONFIG.projectPath}\`` : ''}
 
 > Last updated: ${new Date().toISOString().split('T')[0]} | Total: **${Math.round(totalHours * 10) / 10} hours** | ${totalCommits} commits
 
@@ -330,12 +355,15 @@ ${JSON.stringify({
 function main() {
   console.log('📊 Dev Clock - Calculating development time...\n');
 
+  const projectName = getProjectName();
+  console.log(`Project: ${projectName}`);
+
   if (CONFIG.projectPath) {
-    console.log(`Project filter: ${CONFIG.projectPath}`);
+    console.log(`Path filter: ${CONFIG.projectPath}`);
   }
 
   const commits = getCommitHistory();
-  console.log(`Found ${commits.length} commits${CONFIG.projectPath ? ` touching ${CONFIG.projectPath}` : ''}`);
+  console.log(`Found ${commits.length} commits`);
 
   if (commits.length === 0) {
     console.log('No commits found. Skipping update.');
@@ -358,7 +386,7 @@ function main() {
     }
   }
 
-  const markdown = generateMarkdown(sessions, phaseStats, dailyStats);
+  const markdown = generateMarkdown(sessions, phaseStats, dailyStats, projectName);
 
   // Ensure directory exists
   const dir = path.dirname(CONFIG.devClockPath);
