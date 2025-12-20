@@ -1,0 +1,188 @@
+# How I Built a 9-Step Development Workflow Using AI Agents
+
+**Most solo developers are still doing everything manually.**
+
+Requirements gathering. Architecture design. Test planning. Documentation. All bottlenecks that slow down what should be fast: shipping working software.
+
+I spent months building an AI-powered development system that handles 80% of my workflow. Here's exactly how it works.
+
+---
+
+## The Problem: Solo Development is Broken
+
+As a solo developer, I wore too many hats. Product manager. Architect. QA engineer. Technical writer. The cognitive load was crushing.
+
+Every project had the same issues:
+- **Vague requirements** led to rework
+- **No design docs** meant inconsistent architecture
+- **Test cases written after bugs** appeared
+- **Zero documentation** for future maintenance
+
+I'd jump straight into code, realize I missed something critical, then refactor everything. Repeat. The "move fast" approach was actually slowing me down.
+
+---
+
+## The Solution: Specialized AI Agents
+
+Instead of one general-purpose AI assistant, I built a team of specialized agents. Each has a specific role, specific tools, and a defined output.
+
+### Agent 1: @designer (Requirements Analyst)
+
+Before any design work begins, this agent conducts deep research:
+- Searches for similar apps and analyzes competitors
+- Researches best practices for the project type
+- Asks methodical questions to capture complete requirements
+
+The output? A structured requirements document covering:
+- Project type, purpose, and target users
+- Design system preferences
+- Page structure and navigation
+- Components needed
+- Technical stack decisions
+
+**Key insight:** The designer agent uses the Opus model for complex reasoning. It doesn't assume - it asks until requirements are complete.
+
+### Agent 2: @architect (System Designer)
+
+With requirements captured, the architect takes over with a two-phase approach:
+
+**Phase 1: Discovery**
+- Reviews requirements
+- Proposes 2-3 implementation approaches
+- Presents trade-offs for each option
+- Waits for my approval before proceeding
+
+**Phase 2: PRD Creation**
+- Creates detailed Product Requirements Document
+- Generates visual workflow diagrams (Draw.io format)
+- Creates HTML mockups with Tailwind CSS
+- Submits everything for human review via Jira
+
+The PRD includes database schemas, API structures, component hierarchies, state management strategy, and a task breakdown with complexity estimates.
+
+### Agent 3: @qa (Test Plan Creator)
+
+Here's the counterintuitive part: test cases come BEFORE development.
+
+The QA agent reads the approved PRD and generates comprehensive test cases:
+- Positive tests (happy path)
+- Negative tests (error handling)
+- Boundary tests (edge values)
+
+Each test case includes specific steps, expected behavior, test data, and priority level. The output is a CSV file that tracks execution during manual testing.
+
+**Why test before code?** It validates understanding. Forces clarity on requirements. Catches gaps before I write a single line of code.
+
+---
+
+## The 9-Step Workflow
+
+These agents fit into a structured development process:
+
+| Step | Activity | Agent | Output |
+|------|----------|-------|--------|
+| 1 | DEV-CLOCK Setup | - | Time tracking document |
+| 2 | PRD & Design | @architect | APP_PRD.md, workflow.drawio |
+| 3 | Test Cases | @qa | TEST-PLAN.csv |
+| 4 | Build | Claude Code | Working code |
+| 5 | Manual Testing | Human | Test execution results |
+| 6 | Debug & Feedback | Claude Code | Bug fixes |
+| 7 | Code Walkthrough | @walkthrough | WALKTHROUGH.md |
+| 8 | Ship | Deploy scripts | Live application |
+| 9 | Time Retrospective | - | Lessons learned |
+
+**The critical rule:** No coding without an approved design. No coding without a test plan.
+
+Human approval gates at Steps 2, 3, and 8 ensure AI proposals get validated before investment.
+
+---
+
+## The Review Loop: Jira Integration
+
+Here's where it gets interesting. The workflow integrates with Jira for structured reviews.
+
+When @architect completes a PRD:
+1. Creates a Jira task: "Review PRD: [Feature]"
+2. Attaches PRD document, workflow diagram, and mockups
+3. Assigns to me for review
+
+I review in Jira. If I have feedback:
+- Add comments describing changes needed
+- Keep status as "In Review"
+- Run `/checkprd` command
+
+The architect reads my feedback, revises the PRD, and resubmits. This loop continues until I approve.
+
+When approved:
+- Move Jira task to "Done"
+- Architect automatically creates Epic, Stories, and Tasks
+- Development begins with full traceability
+
+---
+
+## Real Example: Strength Profile Tracker
+
+I built a fitness tracking PWA using this workflow.
+
+**Step 2 output:** PRD covering profile management, exercise tracking, strength calculations, and progress visualization. Architect created HTML mockups for each screen.
+
+**Step 3 output:** 50+ test cases covering CRUD operations, validation rules, data persistence, and UI components. Priority P0 tests defined the "smoke test" suite.
+
+**Step 4:** Built with Next.js, TypeScript, Tailwind CSS. The approved design made implementation straightforward - no architectural debates mid-sprint.
+
+**Step 5:** Executed test plan. Found 3 edge cases. Logged as Jira bugs linked to specific test case IDs.
+
+**Result:** Shipped a fully-tested PWA with comprehensive documentation. Every requirement traced from initial capture through deployment.
+
+---
+
+## Key Learnings
+
+### 1. Specialization beats generalization
+
+One agent doing everything produces mediocre outputs. Specialized agents with defined responsibilities produce expert-level work in their domain.
+
+### 2. Human gates matter
+
+AI proposes, human approves. The review loops aren't overhead - they're quality control. They catch wrong assumptions before they become wrong code.
+
+### 3. Documentation is a product
+
+The PRD, test plan, and walkthrough aren't bureaucracy. They're deliverables that make the codebase maintainable. Future me thanks past me.
+
+### 4. Front-loaded effort saves time
+
+Spending time on requirements and design feels slow. But it's faster than refactoring half-built features because you missed something obvious.
+
+---
+
+## Try It Yourself
+
+This system runs on Claude Code with custom agents and slash commands. The core components:
+
+**Agents** (stored in `~/.claude/agents/`):
+- `designer.md` - Requirements gathering
+- `architect.md` - PRD and design
+- `qa.md` - Test case generation
+- `walkthrough.md` - Documentation
+
+**Commands** (stored in `~/.claude/commands/`):
+- `/newproject` - Initialize project templates
+- `/checkprd` - Check Jira review status
+- `/jirastatus` - View sprint progress
+
+**Integration:**
+- MCP server for Jira (mcp-atlassian)
+- Git for version control (including agent configs)
+
+Start simple: Create one specialized agent for your biggest bottleneck. Document its responsibilities, inputs, and expected outputs. Iterate from there.
+
+---
+
+**What's your biggest bottleneck in solo development?**
+
+I'd love to hear how others are using AI to streamline their workflows. Drop a comment with your approach - or the problem you're still trying to solve.
+
+---
+
+*Building in public at github.com/castroarun*
