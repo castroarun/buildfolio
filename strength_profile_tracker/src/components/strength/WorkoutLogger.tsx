@@ -538,11 +538,11 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
       {/* Main Workout Entry - Horizontal scroll: History (left) → Today → Target (right) */}
       <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-visible -mx-4 px-4" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y pan-x' }}>
         {/* Set labels column */}
-        <div className="flex flex-col gap-2 flex-shrink-0 pt-[80px]">
+        <div className="flex flex-col gap-2 flex-shrink-0 pt-[72px]">
           {[0, 1, 2].map(setIndex => (
             <div
               key={setIndex}
-              className="h-[80px] text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center font-bold"
+              className="h-[72px] text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center font-bold"
             >
               S{setIndex + 1}
             </div>
@@ -551,8 +551,8 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
 
         {/* Past Sessions columns (LEFT side - history first) */}
         {pastSessions.slice().reverse().map((session, idx) => (
-          <div key={idx} className="flex flex-col gap-2 flex-shrink-0 min-w-[100px]">
-            <div className="text-center py-2 h-[80px] flex flex-col items-center justify-center">
+          <div key={idx} className="flex flex-col gap-2 flex-shrink-0 min-w-[90px]">
+            <div className="text-center py-2 h-[72px] flex flex-col items-center justify-center">
               <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                 {formatSessionDate(session.date)}
               </span>
@@ -563,7 +563,7 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
               return (
                 <div
                   key={setIndex}
-                  className="h-[80px] flex flex-col items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700/50"
+                  className="h-[72px] flex flex-col items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700/50"
                 >
                   {hasData ? (
                     <>
@@ -584,8 +584,8 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
         ))}
 
         {/* TODAY column - inputs in the middle */}
-        <div className="flex flex-col gap-2 flex-shrink-0 min-w-[200px] flex-1">
-          <div className="text-center py-2 h-[80px] flex flex-col items-center justify-center">
+        <div className="flex flex-col gap-2 flex-shrink-0 min-w-[180px] flex-1">
+          <div className="text-center py-2 h-[72px] flex flex-col items-center justify-center">
             <span className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">📝 Today</span>
             <span className="text-[10px] text-gray-400">enter weight × reps</span>
           </div>
@@ -598,7 +598,7 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
             return (
               <div
                 key={setIndex}
-                className={`h-[80px] flex items-center gap-2 px-3 rounded-xl border-2 transition-all ${
+                className={`h-[72px] flex items-center gap-2 px-3 rounded-xl border-2 transition-all ${
                   isMarkedDone
                     ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
                     : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
@@ -611,7 +611,7 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
                   placeholder={suggestion ? String(suggestion.weight) : '-'}
                   value={todaySet.weight ?? ''}
                   onChange={(e) => handleSetChange(setIndex, 'weight', e.target.value)}
-                  className="w-[72px] text-center text-xl font-bold bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-500 border-0 focus:outline-none focus:ring-0"
+                  className="w-20 text-center text-xl font-bold bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-500 border-0 focus:outline-none focus:ring-0"
                 />
                 <span className="text-xl text-gray-300 dark:text-gray-600 font-bold">×</span>
                 {/* Reps */}
@@ -621,7 +621,7 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
                   placeholder={suggestion ? String(suggestion.reps) : SUGGESTED_REPS[setIndex].toString()}
                   value={todaySet.reps ?? ''}
                   onChange={(e) => handleSetChange(setIndex, 'reps', e.target.value)}
-                  className="w-[55px] text-center text-xl font-bold bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-500 border-0 focus:outline-none focus:ring-0"
+                  className="w-14 text-center text-xl font-bold bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-500 border-0 focus:outline-none focus:ring-0"
                 />
                 {/* Done button */}
                 <button
@@ -653,8 +653,8 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
 
         {/* TARGET column (RIGHT side) - tappable buttons */}
         {suggestions && (
-          <div className="flex flex-col gap-2 flex-shrink-0 min-w-[155px]">
-            <div className="text-center py-2 h-[80px] flex flex-col items-center justify-center">
+          <div className="flex flex-col gap-2 flex-shrink-0 min-w-[140px]">
+            <div className="text-center py-2 h-[72px] flex flex-col items-center justify-center">
               <span className="text-xs text-green-600 dark:text-green-400 font-bold uppercase tracking-wider">🎯 Target</span>
               <span className="text-[10px] text-gray-400">tap to fill</span>
             </div>
@@ -664,7 +664,7 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
                 <button
                   key={setIndex}
                   onClick={() => copyToToday(setIndex)}
-                  className="h-[80px] px-4 py-3 rounded-xl bg-green-100 dark:bg-green-900/40 hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors border-2 border-green-200 dark:border-green-800 flex flex-col items-center justify-center"
+                  className="h-[72px] px-4 py-3 rounded-xl bg-green-100 dark:bg-green-900/40 hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors border-2 border-green-200 dark:border-green-800 flex flex-col items-center justify-center"
                 >
                   <span className="text-xl font-bold text-green-700 dark:text-green-300">
                     {suggestion?.weight ?? '-'}{unit}
