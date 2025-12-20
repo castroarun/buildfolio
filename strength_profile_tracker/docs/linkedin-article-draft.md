@@ -103,7 +103,7 @@ These agents fit into a structured development process:
 
 **The critical rule:** No coding without an approved design. No coding without a test plan.
 
-Human approval gates at Steps 2, 3, and 8 ensure AI proposals get validated before investment.
+Human approval gates at Steps 2, 3, and 8 ensure AI proposals get validated before investment. As Barry Boehm's research showed: fixing a defect in requirements costs 1x, in design 5x, in coding 10x, in testing 20x, and in production 100x. The gates catch deviations at the lowest-cost phase.
 
 ---
 
