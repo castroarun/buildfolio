@@ -25,7 +25,7 @@ I wanted to design and ship real products - not get stuck in endless refactoring
 
 ## The Solution: Specialized AI Agents
 
-Instead of one general-purpose AI assistant, I built a team of specialized agents. Each has a specific role, specific tools, and a defined output.
+I built a team of specialized AI agents - each with a defined role, specific deliverables, and clear handover points between them. Think TOGAF principles applied to AI: structured phases, defined outputs, and explicit "Definition of Done" before moving to the next stage.
 
 ### Agent 1: @designer (Requirements Analyst)
 
