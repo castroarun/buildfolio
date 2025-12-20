@@ -97,6 +97,7 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
   const [showFullScreenTimer, setShowFullScreenTimer] = useState(false)
   const [timerTrigger, setTimerTrigger] = useState(0) // Increments to trigger auto-start
   const [timerSetInfo, setTimerSetInfo] = useState<{ setNumber: number; weight: number; reps: number | null } | null>(null)
+  const [minimizedTimerState, setMinimizedTimerState] = useState<{ timeLeft: number; duration: number; isRunning: boolean } | null>(null)
 
   // Coaching state - subtle, user-initiated
   const [showFormTip, setShowFormTip] = useState(false)
@@ -299,6 +300,9 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
       reps: currentSet.reps
     })
 
+    // Clear any minimized state - we're starting fresh
+    setMinimizedTimerState(null)
+
     // Increment trigger to reset/restart the timer (this pauses any running timer)
     setTimerTrigger(prev => prev + 1)
 
@@ -308,12 +312,24 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
     }
   }
 
+  // Handle timer minimize (double-tap on full-screen)
+  const handleTimerMinimize = (state: { timeLeft: number; duration: number; isRunning: boolean }) => {
+    setMinimizedTimerState(state)
+    setShowFullScreenTimer(false)
+  }
+
   // Handle timer close - resets timer state
   const handleTimerClose = () => {
     setShowFullScreenTimer(false)
+    setMinimizedTimerState(null)
     // Reset timer trigger to stop any running timer
     setTimerTrigger(prev => prev + 1)
     setTimerSetInfo(null)
+  }
+
+  // Handle expanding RestTimer back to full-screen
+  const handleTimerExpand = () => {
+    setShowFullScreenTimer(true)
   }
 
   return (
@@ -425,8 +441,11 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
             setNumber={timerSetInfo?.setNumber}
             weight={timerSetInfo?.weight}
             reps={timerSetInfo?.reps ?? undefined}
-            onExpand={() => setShowFullScreenTimer(true)}
+            onExpand={handleTimerExpand}
             autoStart={false}
+            initialTimeLeft={minimizedTimerState?.timeLeft}
+            initialDuration={minimizedTimerState?.duration}
+            initialIsRunning={minimizedTimerState?.isRunning}
           />
         </div>
       )}
@@ -440,7 +459,11 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
           weight={timerSetInfo?.weight}
           reps={timerSetInfo?.reps ?? undefined}
           onClose={handleTimerClose}
-          autoStart={true}
+          onMinimize={handleTimerMinimize}
+          autoStart={!minimizedTimerState}
+          initialTimeLeft={minimizedTimerState?.timeLeft}
+          initialDuration={minimizedTimerState?.duration}
+          initialIsRunning={minimizedTimerState?.isRunning}
         />
       )}
 

@@ -20,6 +20,9 @@ interface RestTimerProps {
   onExpand?: () => void
   autoStart?: boolean
   compact?: boolean
+  initialTimeLeft?: number
+  initialDuration?: number
+  initialIsRunning?: boolean
 }
 
 export default function RestTimer({
@@ -31,33 +34,44 @@ export default function RestTimer({
   onTimerEnd,
   onExpand,
   autoStart = false,
-  compact = false
+  compact = false,
+  initialTimeLeft,
+  initialDuration,
+  initialIsRunning
 }: RestTimerProps) {
   const { unit } = useUnit()
-  const [duration, setDuration] = useState(90)
-  const [timeLeft, setTimeLeft] = useState(90)
-  const [isRunning, setIsRunning] = useState(false)
+  const [duration, setDuration] = useState(initialDuration ?? 90)
+  const [timeLeft, setTimeLeft] = useState(initialTimeLeft ?? 90)
+  const [isRunning, setIsRunning] = useState(initialIsRunning ?? false)
   const [mode, setMode] = useState<TimerMode>('countdown')
   const [hasEnded, setHasEnded] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Load settings and exercise-specific duration on mount
+  // Load settings and exercise-specific duration on mount (unless initial values provided)
   useEffect(() => {
-    const settings = getTimerSettings()
-    let initialDuration = settings.defaultDuration
-
-    if (exerciseId) {
-      initialDuration = getExerciseTimerDuration(exerciseId)
+    // If we have initial values from minimize, don't override them
+    if (initialTimeLeft !== undefined && initialDuration !== undefined) {
+      if (initialIsRunning) {
+        setIsRunning(true)
+      }
+      return
     }
 
-    setDuration(initialDuration)
-    setTimeLeft(initialDuration)
+    const settings = getTimerSettings()
+    let loadedDuration = settings.defaultDuration
+
+    if (exerciseId) {
+      loadedDuration = getExerciseTimerDuration(exerciseId)
+    }
+
+    setDuration(loadedDuration)
+    setTimeLeft(loadedDuration)
 
     if (autoStart && settings.autoStart) {
       setIsRunning(true)
     }
-  }, [exerciseId, autoStart])
+  }, [exerciseId, autoStart, initialTimeLeft, initialDuration, initialIsRunning])
 
   // Cleanup interval on unmount
   useEffect(() => {

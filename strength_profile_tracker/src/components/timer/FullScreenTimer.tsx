@@ -19,7 +19,11 @@ interface FullScreenTimerProps {
   reps?: number
   onTimerEnd?: () => void
   onClose: () => void
+  onMinimize?: (state: { timeLeft: number; duration: number; isRunning: boolean }) => void
   autoStart?: boolean
+  initialTimeLeft?: number
+  initialDuration?: number
+  initialIsRunning?: boolean
 }
 
 export default function FullScreenTimer({
@@ -30,33 +34,52 @@ export default function FullScreenTimer({
   reps,
   onTimerEnd,
   onClose,
-  autoStart = true
+  onMinimize,
+  autoStart = true,
+  initialTimeLeft,
+  initialDuration,
+  initialIsRunning
 }: FullScreenTimerProps) {
   const { unit } = useUnit()
-  const [duration, setDuration] = useState(90)
-  const [timeLeft, setTimeLeft] = useState(90)
-  const [isRunning, setIsRunning] = useState(false)
+  const [duration, setDuration] = useState(initialDuration ?? 90)
+  const [timeLeft, setTimeLeft] = useState(initialTimeLeft ?? 90)
+  const [isRunning, setIsRunning] = useState(initialIsRunning ?? false)
   const [mode, setMode] = useState<TimerMode>('countdown')
   const [hasEnded, setHasEnded] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const { requestWakeLock, releaseWakeLock, isActive: wakeLockActive } = useWakeLock()
 
-  // Load settings on mount
+  // Load settings on mount (only if not resuming from minimize)
   useEffect(() => {
-    const settings = getTimerSettings()
-    let initialDuration = settings.defaultDuration
-
-    if (exerciseId) {
-      initialDuration = getExerciseTimerDuration(exerciseId)
+    // If we have initial values from minimize, don't override them
+    if (initialTimeLeft !== undefined && initialDuration !== undefined) {
+      if (initialIsRunning) {
+        setIsRunning(true)
+      }
+      return
     }
 
-    setDuration(initialDuration)
-    setTimeLeft(initialDuration)
+    const settings = getTimerSettings()
+    let loadedDuration = settings.defaultDuration
+
+    if (exerciseId) {
+      loadedDuration = getExerciseTimerDuration(exerciseId)
+    }
+
+    setDuration(loadedDuration)
+    setTimeLeft(loadedDuration)
 
     if (autoStart) {
       setIsRunning(true)
     }
-  }, [exerciseId, autoStart])
+  }, [exerciseId, autoStart, initialTimeLeft, initialDuration, initialIsRunning])
+
+  // Handle minimize (double-click on background)
+  const handleMinimize = () => {
+    if (onMinimize) {
+      onMinimize({ timeLeft, duration, isRunning })
+    }
+  }
 
   // Manage wake lock based on timer state
   useEffect(() => {
@@ -227,10 +250,13 @@ export default function FullScreenTimer({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
+    <div
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black"
+      onDoubleClick={handleMinimize}
+    >
       {/* Close button */}
       <button
-        onClick={skipRest}
+        onClick={(e) => { e.stopPropagation(); skipRest() }}
         className="absolute top-6 right-6 text-gray-400 hover:text-white text-3xl transition-colors"
         aria-label="Close timer"
       >
@@ -246,7 +272,7 @@ export default function FullScreenTimer({
 
       {/* Mode toggle */}
       <button
-        onClick={toggleMode}
+        onClick={(e) => { e.stopPropagation(); toggleMode() }}
         className="absolute top-8 left-6 text-gray-500 hover:text-white flex items-center gap-2 text-xs transition-colors uppercase tracking-wider"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,7 +337,7 @@ export default function FullScreenTimer({
 
       {/* Preset buttons */}
       {mode === 'countdown' && (
-        <div className="flex gap-3 mt-10">
+        <div className="flex gap-3 mt-10" onClick={(e) => e.stopPropagation()}>
           {TIMER_PRESETS.map(preset => (
             <button
               key={preset}
@@ -329,7 +355,7 @@ export default function FullScreenTimer({
       )}
 
       {/* Control buttons */}
-      <div className="flex items-center gap-8 mt-8">
+      <div className="flex items-center gap-8 mt-8" onClick={(e) => e.stopPropagation()}>
         {/* -15s */}
         {mode === 'countdown' && (
           <button
@@ -379,12 +405,16 @@ export default function FullScreenTimer({
         )}
       </div>
 
-      {/* Skip button */}
+      {/* End Timer / Skip Rest button - prominent */}
       <button
-        onClick={skipRest}
-        className="mt-10 px-8 py-3 text-gray-600 hover:text-white transition-colors text-sm uppercase tracking-wider"
+        onClick={(e) => { e.stopPropagation(); skipRest() }}
+        className="mt-10 px-10 py-4 bg-gray-800 hover:bg-gray-700 border-2 border-gray-600 hover:border-gray-500 text-white rounded-xl transition-all text-lg font-semibold uppercase tracking-wider flex items-center gap-3"
       >
-        Skip Rest
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+        </svg>
+        End Timer
       </button>
 
       {/* Wake lock indicator */}
@@ -394,6 +424,11 @@ export default function FullScreenTimer({
           Screen kept on
         </div>
       )}
+
+      {/* Double-click hint */}
+      <p className="absolute bottom-6 right-0 left-0 text-center text-gray-700 text-xs">
+        Double-tap anywhere to minimize
+      </p>
     </div>
   )
 }
