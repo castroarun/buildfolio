@@ -405,12 +405,12 @@ export default function FullScreenTimer({
         )}
       </div>
 
-      {/* End Timer / Skip Rest button - prominent */}
+      {/* End Timer / Skip Rest button */}
       <button
         onClick={(e) => { e.stopPropagation(); skipRest() }}
-        className="mt-10 px-10 py-4 bg-gray-800 hover:bg-gray-700 border-2 border-gray-600 hover:border-gray-500 text-white rounded-xl transition-all text-lg font-semibold uppercase tracking-wider flex items-center gap-3"
+        className="mt-6 px-5 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 hover:border-gray-500 text-white rounded-lg transition-all text-sm font-medium uppercase tracking-wider flex items-center gap-2"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
         </svg>

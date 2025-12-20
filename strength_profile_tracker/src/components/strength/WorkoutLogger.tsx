@@ -435,7 +435,7 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
             </button>
           </div>
           <RestTimer
-            key={timerTrigger}
+            key={minimizedTimerState ? `minimized-${timerTrigger}` : `fresh-${timerTrigger}`}
             exerciseId={exerciseId}
             exerciseName={exercise?.name}
             setNumber={timerSetInfo?.setNumber}
