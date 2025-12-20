@@ -156,15 +156,27 @@ A fitness tracking PWA built using this workflow.
 
 The DEV-CLOCK tracks time across phases. The retrospective (Step 9) analyzes where time actually went. These insights from earlier projects shaped the current workflow:
 
-| Pain Point | Root Cause | Solution Built |
-|------------|------------|----------------|
-| 70% of time spent firefighting bugs during build | Jumped to code without validated requirements | **@designer + @architect agents** - front-load design phase with structured outputs |
-| Couldn't recall where execution halted or what decisions were made | Context scattered across chat history | **`/jirastatus` command** - structured project summary showing current phase and blockers |
-| Repeatedly asking "which file?" and scrolling through documents | Reviews mixed with development workflow | **Jira integration** - externalize review, decision-making, and approvals outside the build context |
+[SCREENSHOT: retro-flow-diagram.png - Three-lane flow showing: Root Cause → Pain Point → Solution for each friction point]
 
-**The pattern:** Every agent and command exists because a previous project revealed a friction point. The retrospective phase turns those learnings into system improvements.
+```
+┌─────────────────────┐     ┌──────────────────────────┐     ┌─────────────────────────────┐
+│     ROOT CAUSE      │ ──▶ │       PAIN POINT         │ ──▶ │        SOLUTION             │
+├─────────────────────┤     ├──────────────────────────┤     ├─────────────────────────────┤
+│ Jumped to code      │     │ 70% time firefighting    │     │ @designer + @architect      │
+│ without validated   │     │ bugs during build        │     │ agents with structured      │
+│ requirements        │     │                          │     │ outputs                     │
+├─────────────────────┤     ├──────────────────────────┤     ├─────────────────────────────┤
+│ Context scattered   │     │ Couldn't recall where    │     │ /jirastatus command for     │
+│ across chat         │     │ execution halted or      │     │ project summary and         │
+│ history             │     │ decisions made           │     │ phase tracking              │
+├─────────────────────┤     ├──────────────────────────┤     ├─────────────────────────────┤
+│ Reviews mixed with  │     │ Scrolling documents,     │     │ Jira integration for        │
+│ development         │     │ asking "which file?"     │     │ external review and         │
+│ workflow            │     │ repeatedly               │     │ decision-making             │
+└─────────────────────┘     └──────────────────────────┘     └─────────────────────────────┘
+```
 
-[SCREENSHOT: dev-clock-retro.png - DEV-CLOCK showing time distribution across phases with retrospective notes]
+**This isn't theoretical architecture - every component solves a problem that actually happened.** The retrospective phase ensures friction points become system improvements, not recurring issues.
 
 ---
 
