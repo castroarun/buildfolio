@@ -34,7 +34,7 @@ Before any design work begins, this agent conducts deep research:
 - Identifies best practices and common patterns for the project type
 - Asks methodical questions to capture complete requirements
 
-The output? A structured requirements document covering:
+**Output:** A structured requirements document covering:
 - Project type, purpose, and target users
 - Design system preferences
 - Page structure and navigation
