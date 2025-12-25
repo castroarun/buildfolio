@@ -43,18 +43,35 @@ export default function StrengthCard({ strength, onLevelSelect, showBodyPart = f
   }, [isExpanded, requestWakeLock, releaseWakeLock, isWakeLockActive])
 
   return (
-    <Card padding="sm" className="mb-3">
+    <Card
+      padding="sm"
+      className={`mb-3 transition-all ${
+        isExpanded
+          ? 'ring-2 ring-blue-400 dark:ring-blue-500 ring-offset-2 dark:ring-offset-gray-900'
+          : ''
+      }`}
+    >
       {/* Header - clickable to expand */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between mb-3"
       >
         <div className="flex items-center gap-2">
+          {/* In-progress indicator dot */}
+          {isExpanded && (
+            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+          )}
           <h3 className="font-semibold text-[#2C3E50] dark:text-gray-100 text-sm">
             {strength.exerciseName}
           </h3>
           {strength.isDumbbell && (
             <span className="text-xs text-gray-400 dark:text-gray-500">(per hand)</span>
+          )}
+          {/* In-progress badge */}
+          {isExpanded && (
+            <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-full font-medium">
+              Active
+            </span>
           )}
         </div>
         <div className="flex items-center gap-2">
