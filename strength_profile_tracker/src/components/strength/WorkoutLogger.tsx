@@ -656,7 +656,8 @@ export default function WorkoutLogger({ profileId, exerciseId, onLevelUp }: Work
             </div>
             {todaySets.map((_, setIndex) => {
               const set = session.sets[setIndex]
-              const hasData = set?.weight !== null && set?.reps !== null
+              // Check that set exists AND has data (past sessions may have fewer sets)
+              const hasData = set && set.weight !== null && set.reps !== null
               return (
                 <div
                   key={setIndex}
