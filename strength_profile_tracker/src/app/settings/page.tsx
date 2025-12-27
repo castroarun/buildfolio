@@ -15,6 +15,7 @@ import {
 import { loadSampleData, hasSampleData, removeSampleData } from '@/lib/storage/seedData'
 import { getTimerSettings, saveTimerSettings } from '@/lib/storage/timer'
 import { DEFAULT_TIMER_SETTINGS } from '@/types'
+import { GesturesOnboarding } from '@/components/onboarding'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -31,6 +32,8 @@ export default function SettingsPage() {
   const [devTapCount, setDevTapCount] = useState(0)
   const [showDevMode, setShowDevMode] = useState(false)
   const [defaultSets, setDefaultSets] = useState(DEFAULT_TIMER_SETTINGS.defaultSets)
+  const [showGesturesGuide, setShowGesturesGuide] = useState(false)
+  const [currentProfileId, setCurrentProfileId] = useState<string | null>(null)
 
   useEffect(() => {
     setNotificationStatus(getNotificationPermission())
@@ -41,6 +44,9 @@ export default function SettingsPage() {
     // Load timer/workout settings
     const timerSettings = getTimerSettings()
     setDefaultSets(timerSettings.defaultSets)
+    // Get last visited profile for linking to Training Program
+    const lastProfileId = localStorage.getItem('lastVisitedProfile')
+    setCurrentProfileId(lastProfileId)
   }, [])
 
   // Handle secret tap on version to unlock developer mode
@@ -359,6 +365,38 @@ export default function SettingsPage() {
                 </button>
               </div>
             </div>
+
+            {/* Training Program */}
+            <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4">
+              <div>
+                <p className="font-medium text-gray-700 dark:text-gray-200">Training Program</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Select your workout split</p>
+              </div>
+              {currentProfileId ? (
+                <Link
+                  href={`/profile/${currentProfileId}/program`}
+                  className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Open
+                </Link>
+              ) : (
+                <span className="text-xs text-gray-400">Select a profile first</span>
+              )}
+            </div>
+
+            {/* Gestures Guide */}
+            <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4">
+              <div>
+                <p className="font-medium text-gray-700 dark:text-gray-200">Gestures Guide</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Learn the app&apos;s hidden gestures</p>
+              </div>
+              <button
+                onClick={() => setShowGesturesGuide(true)}
+                className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                View
+              </button>
+            </div>
           </div>
         </section>
 
@@ -527,6 +565,11 @@ export default function SettingsPage() {
           </a>
         </div>
       </main>
+
+      {/* Gestures Guide Modal */}
+      {showGesturesGuide && (
+        <GesturesOnboarding onComplete={() => setShowGesturesGuide(false)} />
+      )}
     </div>
   )
 }

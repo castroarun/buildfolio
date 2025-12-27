@@ -189,7 +189,8 @@ export interface WorkoutSession {
   date: string           // ISO date string (YYYY-MM-DD)
   exerciseId: Exercise
   profileId: string
-  sets: WorkoutSet[]     // Always 3 sets
+  sets: WorkoutSet[]     // Variable number of sets (default 3)
+  completedSets?: number[]  // Indices of sets marked as "done" by user
 }
 
 // Suggested rep scheme for each set
@@ -245,6 +246,7 @@ export interface TimerSettings {
   autoStart: boolean           // Auto-start timer after logging a set
   keepAwakeDuringWorkout: boolean  // Keep screen awake during workout session
   defaultSets: number          // Default number of sets per exercise (default: 3)
+  warningTime: number          // Seconds remaining to trigger warning (0 to disable)
 }
 
 export interface ExerciseTimerHistory {
@@ -252,12 +254,51 @@ export interface ExerciseTimerHistory {
   lastDuration: number         // Last used duration for this exercise in seconds
 }
 
-// Timer presets in seconds (2:30 to 5:00 in 30s increments)
-export const TIMER_PRESETS = [150, 180, 210, 240, 270, 300] as const
-export type TimerPreset = typeof TIMER_PRESETS[number]
+// All available timer presets in seconds (30s to 5:00 in 30s increments)
+export const ALL_TIMER_PRESETS = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300] as const
+export type TimerPreset = typeof ALL_TIMER_PRESETS[number]
+
+// Legacy: default visible presets (for settings screen)
+export const TIMER_PRESETS = ALL_TIMER_PRESETS
+
+/**
+ * Get 5 timer presets centered around the current duration
+ * Shows 2 presets before and 2 after the closest match
+ */
+export function getDynamicTimerPresets(currentDuration: number): number[] {
+  const presets = [...ALL_TIMER_PRESETS]
+
+  // Find the closest preset to current duration
+  let closestIndex = 0
+  let minDiff = Math.abs(presets[0] - currentDuration)
+
+  for (let i = 1; i < presets.length; i++) {
+    const diff = Math.abs(presets[i] - currentDuration)
+    if (diff < minDiff) {
+      minDiff = diff
+      closestIndex = i
+    }
+  }
+
+  // Calculate start index to show 5 presets centered around the closest
+  let startIndex = closestIndex - 2
+
+  // Adjust if we're at the edges
+  if (startIndex < 0) {
+    startIndex = 0
+  } else if (startIndex + 5 > presets.length) {
+    startIndex = Math.max(0, presets.length - 5)
+  }
+
+  return presets.slice(startIndex, startIndex + 5)
+}
 
 // Timer increment for extend/reduce buttons
 export const TIMER_INCREMENT = 15 // seconds
+
+// Warning time presets in seconds (0 = disabled)
+export const WARNING_TIME_PRESETS = [0, 15, 30, 45, 60] as const
+export type WarningTimePreset = typeof WARNING_TIME_PRESETS[number]
 
 // Default timer settings
 export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
@@ -266,5 +307,6 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   vibrationEnabled: true,
   autoStart: true,
   keepAwakeDuringWorkout: true,  // Default to keeping screen awake
-  defaultSets: 3                 // Default 3 sets per exercise
+  defaultSets: 3,                // Default 3 sets per exercise
+  warningTime: 30                // Default 30-second warning
 }
