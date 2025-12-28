@@ -2423,177 +2423,225 @@
         </div>
       </section>
 
-      <!-- Engineering Principles Section (V7 Style) -->
-      <section id="principles" class="principles">
-        <h2 class="numbered-heading">Engineering Principles</h2>
+      <!-- Engineering Principles Section - Flip Cards (V7 Style) -->
+      <section id="principles" class="principles-section">
+        <div class="container">
+          <h2 class="numbered-heading">Engineering Principles</h2>
 
-        <div class="principles-grid">
-          <!-- DRY -->
-          <article class="principle-card fade-up">
-            <span class="principle-acronym">DRY</span>
-            <h3 class="principle-name">Don't Repeat Yourself</h3>
-            <p class="principle-desc">Every piece of knowledge has a single, authoritative representation.</p>
-            <div class="principle-contrast">
-              <div class="principle-row bad">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          <p class="process-intro fade-up">
+            Hover over each card to reveal how we apply these principles.
+          </p>
+
+          <div class="flip-grid">
+            <!-- DRY Flip Card -->
+            <div class="flip-card">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="flip-principle">DRY</span>
+                  <span class="flip-name">Don't Repeat Yourself</span>
+                  <span class="flip-desc">Every piece of knowledge has a single, authoritative representation.</span>
+                  <span class="flip-hint">Hover to reveal</span>
                 </div>
-                <div>
-                  <div class="principle-label">Instead of</div>
-                  <div class="principle-text">Copy-paste validation to 12 forms</div>
-                </div>
-              </div>
-              <div class="principle-row good">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-                <div>
-                  <div class="principle-label">We do</div>
-                  <div class="principle-text">One useValidation hook, 0 duplicates</div>
+                <div class="flip-card-back">
+                  <div class="flip-contrast">
+                    <div class="flip-contrast-row bad">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">Instead of</div>
+                        <div class="flip-contrast-text">Copy-paste validation logic to all 12 forms</div>
+                      </div>
+                    </div>
+                    <div class="flip-contrast-row good">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">We do</div>
+                        <div class="flip-contrast-text">One useValidation hook, 12 forms, 0 duplicates</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </article>
 
-          <!-- KISS -->
-          <article class="principle-card fade-up">
-            <span class="principle-acronym">KISS</span>
-            <h3 class="principle-name">Keep It Simple</h3>
-            <p class="principle-desc">Simplicity is prerequisite for reliability.</p>
-            <div class="principle-contrast">
-              <div class="principle-row bad">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            <!-- KISS Flip Card -->
+            <div class="flip-card">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="flip-principle">KISS</span>
+                  <span class="flip-name">Keep It Simple</span>
+                  <span class="flip-desc">Simplicity is prerequisite for reliability.</span>
+                  <span class="flip-hint">Hover to reveal</span>
                 </div>
-                <div>
-                  <div class="principle-label">Instead of</div>
-                  <div class="principle-text">State machine with 47 transitions</div>
-                </div>
-              </div>
-              <div class="principle-row good">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-                <div>
-                  <div class="principle-label">We do</div>
-                  <div class="principle-text">Simple array of sets. Done.</div>
+                <div class="flip-card-back">
+                  <div class="flip-contrast">
+                    <div class="flip-contrast-row bad">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">Instead of</div>
+                        <div class="flip-contrast-text">Build a state machine with 47 transitions</div>
+                      </div>
+                    </div>
+                    <div class="flip-contrast-row good">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">We do</div>
+                        <div class="flip-contrast-text">Simple array of sets with timestamps. Done.</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </article>
 
-          <!-- YAGNI -->
-          <article class="principle-card fade-up">
-            <span class="principle-acronym">YAGNI</span>
-            <h3 class="principle-name">You Aren't Gonna Need It</h3>
-            <p class="principle-desc">Build what's needed now, not what might be.</p>
-            <div class="principle-contrast">
-              <div class="principle-row bad">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            <!-- YAGNI Flip Card -->
+            <div class="flip-card">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="flip-principle">YAGNI</span>
+                  <span class="flip-name">You Aren't Gonna Need It</span>
+                  <span class="flip-desc">Build what's needed now, not what might be.</span>
+                  <span class="flip-hint">Hover to reveal</span>
                 </div>
-                <div>
-                  <div class="principle-label">Instead of</div>
-                  <div class="principle-text">Multi-tenancy "just in case"</div>
-                </div>
-              </div>
-              <div class="principle-row good">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-                <div>
-                  <div class="principle-label">We do</div>
-                  <div class="principle-text">Ship MVP. Iterate when needed.</div>
+                <div class="flip-card-back">
+                  <div class="flip-contrast">
+                    <div class="flip-contrast-row bad">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">Instead of</div>
+                        <div class="flip-contrast-text">Add multi-tenancy "in case we need it later"</div>
+                      </div>
+                    </div>
+                    <div class="flip-contrast-row good">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">We do</div>
+                        <div class="flip-contrast-text">Ship single-tenant MVP. Iterate when needed.</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </article>
 
-          <!-- TDD -->
-          <article class="principle-card fade-up">
-            <span class="principle-acronym">TDD</span>
-            <h3 class="principle-name">Test-Driven Development</h3>
-            <p class="principle-desc">Write tests first. Code follows specification.</p>
-            <div class="principle-contrast">
-              <div class="principle-row bad">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            <!-- TDD Flip Card -->
+            <div class="flip-card">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="flip-principle">TDD</span>
+                  <span class="flip-name">Test-Driven Development</span>
+                  <span class="flip-desc">Write tests first. Code follows specification.</span>
+                  <span class="flip-hint">Hover to reveal</span>
                 </div>
-                <div>
-                  <div class="principle-label">Instead of</div>
-                  <div class="principle-text">Tests "when we have time"</div>
-                </div>
-              </div>
-              <div class="principle-row good">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-                <div>
-                  <div class="principle-label">We do</div>
-                  <div class="principle-text">Red, green, refactor. Always.</div>
+                <div class="flip-card-back">
+                  <div class="flip-contrast">
+                    <div class="flip-contrast-row bad">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">Instead of</div>
+                        <div class="flip-contrast-text">Write tests after shipping, "when we have time"</div>
+                      </div>
+                    </div>
+                    <div class="flip-contrast-row good">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">We do</div>
+                        <div class="flip-contrast-text">Test first. Red, green, refactor. Always.</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </article>
 
-          <!-- CI/CD -->
-          <article class="principle-card fade-up">
-            <span class="principle-acronym">CI/CD</span>
-            <h3 class="principle-name">Continuous Integration</h3>
-            <p class="principle-desc">Automate builds, tests, and deployments.</p>
-            <div class="principle-contrast">
-              <div class="principle-row bad">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            <!-- CI/CD Flip Card -->
+            <div class="flip-card">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="flip-principle">CI/CD</span>
+                  <span class="flip-name">Continuous Integration</span>
+                  <span class="flip-desc">Automate builds, tests, and deployments.</span>
+                  <span class="flip-hint">Hover to reveal</span>
                 </div>
-                <div>
-                  <div class="principle-label">Instead of</div>
-                  <div class="principle-text">Manual deploy every Friday 5pm</div>
-                </div>
-              </div>
-              <div class="principle-row good">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-                <div>
-                  <div class="principle-label">We do</div>
-                  <div class="principle-text">Push to main, auto-deploy in 4 min</div>
+                <div class="flip-card-back">
+                  <div class="flip-contrast">
+                    <div class="flip-contrast-row bad">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">Instead of</div>
+                        <div class="flip-contrast-text">Manual deploy every Friday at 5pm</div>
+                      </div>
+                    </div>
+                    <div class="flip-contrast-row good">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">We do</div>
+                        <div class="flip-contrast-text">Push to main, tests run, auto-deploy in 4 min</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </article>
 
-          <!-- SOLID -->
-          <article class="principle-card fade-up">
-            <span class="principle-acronym">SOLID</span>
-            <h3 class="principle-name">Single Responsibility</h3>
-            <p class="principle-desc">A class should have only one reason to change.</p>
-            <div class="principle-contrast">
-              <div class="principle-row bad">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            <!-- SOLID Flip Card -->
+            <div class="flip-card">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="flip-principle">SOLID</span>
+                  <span class="flip-name">Single Responsibility</span>
+                  <span class="flip-desc">A class should have only one reason to change.</span>
+                  <span class="flip-hint">Hover to reveal</span>
                 </div>
-                <div>
-                  <div class="principle-label">Instead of</div>
-                  <div class="principle-text">UserService does auth + email + logs</div>
-                </div>
-              </div>
-              <div class="principle-row good">
-                <div class="principle-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-                <div>
-                  <div class="principle-label">We do</div>
-                  <div class="principle-text">Each service, one job</div>
+                <div class="flip-card-back">
+                  <div class="flip-contrast">
+                    <div class="flip-contrast-row bad">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">Instead of</div>
+                        <div class="flip-contrast-text">UserService handles auth, email, and logging</div>
+                      </div>
+                    </div>
+                    <div class="flip-contrast-row good">
+                      <div class="flip-contrast-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                      </div>
+                      <div>
+                        <div class="flip-contrast-label">We do</div>
+                        <div class="flip-contrast-text">UserService, AuthService, EmailService - each one job</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </article>
+          </div>
+
+          <a href="v7-principles.html" class="principles-link" style="display: block; text-align: center; margin-top: var(--space-12);">
+            Explore all approaches <span>→</span>
+          </a>
         </div>
-
-        <a href="v7-principles.html" class="principles-link">
-          Explore all approaches <span>→</span>
-        </a>
       </section>
 
       <!-- Contact Section -->
