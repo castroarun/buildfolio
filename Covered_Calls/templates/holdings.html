@@ -1,0 +1,1165 @@
+{% extends 'base.html' %}
+
+{% block title %}Holdings Dashboard - Covered Calls Backtester{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --profit-green: #22c55e;
+        --loss-red: #ef4444;
+        --card-bg: #1e293b;
+        --card-hover: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --border-color: #475569;
+    }
+
+    .page-header { padding: 1.5rem 0 1rem; }
+
+    .portfolio-summary {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .summary-stat { text-align: center; padding: 0.5rem; }
+    .summary-stat .value { font-size: 1.25rem; font-weight: 700; }
+    .summary-stat .label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; }
+
+    .sort-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .sort-btn {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        padding: 0.4rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .sort-btn:hover, .sort-btn.active {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+    }
+
+    /* Grid Layout */
+    .holdings-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+    @media (max-width: 1200px) { .holdings-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 992px) { .holdings-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 576px) { .holdings-grid { grid-template-columns: 1fr; } }
+
+    /* Flip Card Container */
+    .flip-card {
+        perspective: 1000px;
+        aspect-ratio: 5 / 4;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+    }
+
+    .flip-card.flipped .flip-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 12px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+    }
+
+    .flip-card-back {
+        transform: rotateY(180deg);
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    }
+
+    .flip-card:hover .flip-card-front,
+    .flip-card:hover .flip-card-back {
+        border-color: #60a5fa;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    /* Card Header */
+    .card-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+
+    .stock-info { display: flex; align-items: center; gap: 0.5rem; }
+
+    .stock-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.7rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stock-logo:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .stock-name { font-weight: 600; font-size: 0.85rem; line-height: 1.2; }
+    .stock-symbol { font-size: 0.65rem; color: var(--text-secondary); }
+
+    .pnl-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .pnl-wrapper .pnl-label {
+        font-size: 0.55rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+        text-transform: uppercase;
+    }
+    .pnl-badge {
+        padding: 0.3rem 0.6rem;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+    .pnl-badge.profit { background: rgba(34, 197, 94, 0.2); color: var(--profit-green); }
+    .pnl-badge.loss { background: rgba(239, 68, 68, 0.2); color: var(--loss-red); }
+
+    /* Metrics Row */
+    .metrics-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-item {
+        text-align: center;
+        padding: 0.3rem 0.4rem;
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 6px;
+        flex: 1;
+    }
+    .metric-item .value { font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+    .metric-item .label { font-size: 0.58rem; color: var(--text-secondary); text-transform: uppercase; }
+
+    /* Chart Container */
+    .chart-container {
+        flex: 1;
+        min-height: 50px;
+        position: relative;
+    }
+
+    /* Extra Info */
+    .extra-info-row {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 0.4rem;
+        border-top: 1px solid var(--border-color);
+        margin-top: auto;
+    }
+    .info-badge { display: flex; align-items: center; gap: 0.2rem; font-size: 0.6rem; color: var(--text-secondary); }
+    .info-badge.dividend { color: #fbbf24; }
+    .info-badge.result { color: #a78bfa; }
+
+    /* Flip hint */
+    .flip-hint {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.5rem;
+        font-size: 0.6rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        opacity: 0.7;
+    }
+
+    /* Back of card */
+    .back-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .back-title { font-weight: 600; font-size: 0.9rem; }
+    .back-close { font-size: 0.7rem; color: var(--text-secondary); }
+
+    .fundamentals-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        flex: 1;
+    }
+    .fund-box {
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 6px;
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+    }
+    .fund-box .title { font-size: 0.55rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem; }
+    .fund-box canvas { height: 45px !important; }
+
+    .ratios-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: auto; }
+    .ratio-chip {
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 4px;
+        padding: 0.2rem 0.4rem;
+        border: 1px solid var(--border-color);
+        text-align: center;
+        flex: 1;
+        min-width: 45px;
+    }
+    .ratio-chip .value { font-size: 0.7rem; font-weight: 600; }
+    .ratio-chip .label { font-size: 0.5rem; color: var(--text-secondary); }
+    .ratio-chip.good .value { color: var(--profit-green); }
+    .ratio-chip.warning .value { color: #fbbf24; }
+
+    /* Expanded View Modal */
+    .expanded-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    .expanded-overlay.active { display: flex; }
+
+    .expanded-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 720px;
+        max-height: 90vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-color);
+        animation: expandIn 0.3s ease;
+    }
+
+    @keyframes expandIn {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .expanded-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        background: var(--card-bg);
+    }
+    .header-left { display: flex; align-items: center; gap: 0.75rem; }
+    .header-right { display: flex; align-items: center; gap: 1.5rem; }
+    .div-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .div-indicator .div-val {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #fbbf24;
+    }
+    .div-indicator .div-lbl {
+        font-size: 0.55rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+    }
+
+    .expanded-body { padding: 1.25rem; }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+    }
+    .close-btn:hover { color: var(--text-primary); }
+
+    .expanded-metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .exp-metric { text-align: center; }
+    .exp-metric .value { font-size: 1.25rem; font-weight: 700; }
+    .exp-metric .label { font-size: 0.7rem; color: var(--text-secondary); }
+
+    .expanded-chart { height: 200px; margin-bottom: 1.5rem; }
+
+    .expanded-fundamentals {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .exp-fund-box {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.5));
+        border-radius: 10px;
+        padding: 0.75rem;
+        border: none;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .exp-fund-box .title {
+        font-size: 0.65rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.4rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .exp-fund-box .title::before {
+        content: '';
+        width: 3px;
+        height: 10px;
+        border-radius: 2px;
+    }
+    .exp-fund-box.revenue .title::before { background: linear-gradient(180deg, #3b82f6, #60a5fa); }
+    .exp-fund-box.profit .title::before { background: linear-gradient(180deg, #22c55e, #4ade80); }
+    .exp-fund-box.opm .title::before { background: linear-gradient(180deg, #f59e0b, #fbbf24); }
+    .exp-fund-box canvas { height: 100px !important; }
+
+    .expanded-ratios {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .exp-ratio {
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        text-align: center;
+        flex: 1;
+        min-width: 80px;
+    }
+    .exp-ratio .value { font-size: 1.1rem; font-weight: 700; }
+    .exp-ratio .value .industry-pe { font-weight: 500; color: #94a3b8; font-size: 0.9rem; }
+    .exp-ratio .label { font-size: 0.65rem; color: var(--text-secondary); }
+
+    /* View toggle */
+    .view-toggle { display: flex; gap: 0.25rem; background: var(--card-bg); border-radius: 6px; padding: 0.2rem; }
+    .view-toggle button { background: none; border: none; color: var(--text-secondary); padding: 0.4rem; border-radius: 4px; cursor: pointer; }
+    .view-toggle button.active { background: #3b82f6; color: white; }
+
+    /* Investment Size Bar */
+    .invest-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 4px;
+        width: var(--invest-pct, 50%);
+        background: linear-gradient(90deg, #22c55e, #4ade80);
+        border-radius: 0 0 0 12px;
+        z-index: 5;
+        opacity: 0.9;
+    }
+    .flip-card-front .invest-bar,
+    .flip-card-back .invest-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
+
+    /* Sector View Styles */
+    .sector-group {
+        margin-bottom: 1.5rem;
+    }
+    .sector-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.1));
+        border-radius: 10px;
+        margin-bottom: 0.75rem;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        cursor: pointer;
+    }
+    .sector-header:hover { background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.15)); }
+    .sector-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .sector-name i { color: #3b82f6; }
+    .sector-count {
+        background: rgba(59, 130, 246, 0.2);
+        padding: 0.15rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        color: #60a5fa;
+    }
+    .sector-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+    .sector-stat {
+        text-align: right;
+    }
+    .sector-stat .value { font-size: 0.85rem; font-weight: 600; }
+    .sector-stat .label { font-size: 0.6rem; color: var(--text-secondary); }
+    .sector-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+    @media (max-width: 1200px) { .sector-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 992px) { .sector-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 576px) { .sector-grid { grid-template-columns: 1fr; } }
+    .sector-content { display: block; }
+    .sector-content.collapsed { display: none; }
+    .sector-toggle { transition: transform 0.3s; }
+    .sector-header.collapsed .sector-toggle { transform: rotate(-90deg); }
+
+    /* Loading state */
+    .loading-overlay {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        color: var(--text-secondary);
+    }
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--border-color);
+        border-top-color: #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 1rem;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-1">My Holdings</h5>
+                <p class="text-secondary mb-0 small" id="stockCount">Loading...</p>
+            </div>
+            <div class="view-toggle">
+                <button class="active" data-view="grid" title="Grid View" onclick="switchView('grid')"><i class="bi bi-grid-3x3-gap"></i></button>
+                <button data-view="sector" title="Sector View" onclick="switchView('sector')"><i class="bi bi-collection"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Summary -->
+    <div class="portfolio-summary">
+        <div class="row">
+            <div class="col-3"><div class="summary-stat"><div class="value" id="totalInvested">-</div><div class="label">Invested</div></div></div>
+            <div class="col-3"><div class="summary-stat"><div class="value" id="totalCurrent">-</div><div class="label">Current</div></div></div>
+            <div class="col-3"><div class="summary-stat"><div class="value" id="totalPnl">-</div><div class="label">P&L</div></div></div>
+            <div class="col-3"><div class="summary-stat"><div class="value" id="totalReturns">-</div><div class="label">Returns</div></div></div>
+        </div>
+    </div>
+
+    <!-- Sort Controls -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div class="sort-controls">
+            <button class="sort-btn active" data-sort="pnl_pct">P/L %</button>
+            <button class="sort-btn" data-sort="invested">Invested</button>
+            <button class="sort-btn" data-sort="current">Current</button>
+            <button class="sort-btn" data-sort="pnl">P/L</button>
+        </div>
+        <button class="sort-btn" id="sortOrder" onclick="toggleSortOrder()"><i class="bi bi-sort-down"></i></button>
+    </div>
+
+    <!-- Holdings Grid -->
+    <div class="holdings-grid" id="holdingsGrid">
+        <div class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <span>Loading holdings...</span>
+        </div>
+    </div>
+
+    <!-- Sector View Container (hidden by default) -->
+    <div id="sector-view" style="display: none;"></div>
+</div>
+
+<!-- Expanded View Overlay -->
+<div class="expanded-overlay" id="expandedOverlay" onclick="closeExpanded(event)">
+    <div class="expanded-card" onclick="event.stopPropagation()">
+        <div class="expanded-header">
+            <div class="header-left">
+                <div class="stock-logo" id="exp-logo">RIL</div>
+                <div>
+                    <div class="stock-name" id="exp-name">Loading...</div>
+                    <div class="stock-symbol" id="exp-symbol">-</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="div-indicator">
+                    <span class="div-val" id="exp-div-yield">-</span>
+                    <span class="div-lbl">D.Yield</span>
+                </div>
+                <div class="div-indicator">
+                    <span class="div-val" id="exp-div-date">-</span>
+                    <span class="div-lbl">Next Div</span>
+                </div>
+                <button class="close-btn" onclick="closeExpanded(event)">&times;</button>
+            </div>
+        </div>
+        <div class="expanded-body">
+            <div class="expanded-metrics">
+                <div class="exp-metric"><div class="value" id="exp-invested">-</div><div class="label">Invested</div></div>
+                <div class="exp-metric"><div class="value" id="exp-current">-</div><div class="label">Current</div></div>
+                <div class="exp-metric"><div class="value" id="exp-pnl">-</div><div class="label">P&L</div></div>
+                <div class="exp-metric"><div class="value" id="exp-pnl-pct">-</div><div class="label">Returns</div></div>
+            </div>
+            <p class="text-secondary small mb-3" id="exp-overview">Loading...</p>
+
+            <div class="expanded-fundamentals">
+                <div class="exp-fund-box revenue"><div class="title">Revenue (Cr)</div><canvas id="exp-revenue"></canvas></div>
+                <div class="exp-fund-box profit"><div class="title">Net Profit (Cr)</div><canvas id="exp-profit"></canvas></div>
+                <div class="exp-fund-box opm"><div class="title">OPM %</div><canvas id="exp-opm"></canvas></div>
+            </div>
+            <div class="expanded-ratios" id="exp-ratios">
+                <!-- Ratios populated by JS -->
+            </div>
+
+            <!-- Price Chart at bottom -->
+            <div class="expanded-chart mt-3"><canvas id="exp-chart"></canvas></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Global state
+    let holdingsData = [];
+    let currentSort = 'pnl_pct';
+    let sortAscending = false;
+
+    // Store chart instances for cleanup
+    let expChartInstance = null;
+    let expRevenueInstance = null;
+    let expProfitInstance = null;
+    let expOpmInstance = null;
+    let sparklineCharts = {};
+
+    // Format currency in Indian style
+    function formatCurrency(amount, prefix = '₹') {
+        const absAmount = Math.abs(amount);
+        if (absAmount >= 1e7) {
+            return `${prefix}${(amount/1e7).toFixed(2)}Cr`;
+        } else if (absAmount >= 1e5) {
+            return `${prefix}${(amount/1e5).toFixed(2)}L`;
+        } else if (absAmount >= 1e3) {
+            return `${prefix}${(amount/1e3).toFixed(1)}K`;
+        }
+        return `${prefix}${amount.toFixed(0)}`;
+    }
+
+    // Load holdings from API
+    async function loadHoldings() {
+        try {
+            const response = await fetch('/api/holdings');
+            if (!response.ok) throw new Error('Failed to fetch holdings');
+
+            const data = await response.json();
+            holdingsData = data.holdings || [];
+
+            // Update summary
+            updateSummary(data.summary);
+
+            // Render cards
+            renderHoldingCards();
+
+        } catch (error) {
+            console.error('Error loading holdings:', error);
+            document.getElementById('holdingsGrid').innerHTML = `
+                <div class="loading-overlay">
+                    <i class="bi bi-exclamation-circle text-danger me-2" style="font-size: 2rem;"></i>
+                    <span>Error loading holdings. Please try again.</span>
+                </div>
+            `;
+        }
+    }
+
+    // Update portfolio summary
+    function updateSummary(summary) {
+        if (!summary) return;
+
+        document.getElementById('stockCount').textContent = `${summary.stock_count} stocks in portfolio`;
+        document.getElementById('totalInvested').textContent = formatCurrency(summary.total_invested);
+        document.getElementById('totalCurrent').textContent = formatCurrency(summary.total_current);
+
+        const pnlEl = document.getElementById('totalPnl');
+        const pnlPctEl = document.getElementById('totalReturns');
+
+        pnlEl.textContent = (summary.is_profit ? '+' : '') + formatCurrency(summary.total_pnl);
+        pnlEl.className = `value ${summary.is_profit ? 'text-success' : 'text-danger'}`;
+
+        pnlPctEl.textContent = (summary.is_profit ? '+' : '') + summary.total_pnl_pct + '%';
+        pnlPctEl.className = `value ${summary.is_profit ? 'text-success' : 'text-danger'}`;
+    }
+
+    // Render holding cards
+    function renderHoldingCards() {
+        const grid = document.getElementById('holdingsGrid');
+
+        // Sort data
+        const sorted = [...holdingsData].sort((a, b) => {
+            const aVal = a[currentSort] || 0;
+            const bVal = b[currentSort] || 0;
+            return sortAscending ? aVal - bVal : bVal - aVal;
+        });
+
+        // Build HTML
+        let html = '';
+        sorted.forEach((h, idx) => {
+            const pnlClass = h.is_profit ? 'profit' : 'loss';
+            const pnlSign = h.is_profit ? '+' : '';
+
+            html += `
+                <div class="flip-card" data-symbol="${h.symbol}" data-sector="${h.sector}" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <!-- Front -->
+                        <div class="flip-card-front">
+                            <div class="invest-bar" style="--invest-pct: ${h.portfolio_pct}%;"></div>
+                            <div class="card-header-row">
+                                <div class="stock-info">
+                                    <div class="stock-logo" onclick="expandCard('${h.symbol}', event)" title="Click to expand">${h.logo}</div>
+                                    <div>
+                                        <div class="stock-name">${h.name || h.symbol}</div>
+                                        <div class="stock-symbol">${h.symbol}</div>
+                                    </div>
+                                </div>
+                                <div class="pnl-wrapper">
+                                    <span class="pnl-label">P/L %</span>
+                                    <div class="pnl-badge ${pnlClass}">${pnlSign}${h.pnl_pct}%</div>
+                                </div>
+                            </div>
+                            <div class="metrics-row">
+                                <div class="metric-item"><div class="value">${formatCurrency(h.invested)}</div><div class="label">Invested</div></div>
+                                <div class="metric-item"><div class="value">${formatCurrency(h.current)}</div><div class="label">Current</div></div>
+                                <div class="metric-item"><div class="value ${h.is_profit ? 'text-success' : 'text-danger'}">${pnlSign}${formatCurrency(h.pnl)}</div><div class="label">P&L</div></div>
+                            </div>
+                            <div class="chart-container"><canvas id="chart-${h.symbol}"></canvas></div>
+                            <div class="extra-info-row">
+                                <div class="info-badge dividend"><i class="bi bi-coin"></i> <span id="div-${h.symbol}">-</span></div>
+                                <div class="info-badge"><i class="bi bi-pie-chart"></i> ${h.portfolio_pct}%</div>
+                            </div>
+                            <div class="flip-hint"><i class="bi bi-arrow-repeat"></i> Tap to flip</div>
+                        </div>
+                        <!-- Back -->
+                        <div class="flip-card-back">
+                            <div class="invest-bar" style="--invest-pct: ${h.portfolio_pct}%;"></div>
+                            <div class="back-header">
+                                <span class="back-title">${h.symbol} Fundamentals</span>
+                                <span class="back-close"><i class="bi bi-arrow-repeat"></i></span>
+                            </div>
+                            <div class="fundamentals-row">
+                                <div class="fund-box"><div class="title">Revenue 5Y</div><canvas id="rev-${h.symbol}"></canvas></div>
+                                <div class="fund-box"><div class="title">Net Profit 5Y</div><canvas id="profit-${h.symbol}"></canvas></div>
+                            </div>
+                            <div class="ratios-row" id="ratios-${h.symbol}">
+                                <!-- Populated when flipped -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        grid.innerHTML = html;
+
+        // Load sparklines and fundamentals for each stock
+        sorted.forEach(h => {
+            loadSparkline(h.symbol, h.is_profit);
+            loadCardFundamentals(h.symbol);
+        });
+    }
+
+    // Load sparkline chart for a stock
+    async function loadSparkline(symbol, isProfit) {
+        try {
+            const response = await fetch(`/api/historical/${symbol}?period=1y`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+            if (!data.prices || data.prices.length === 0) return;
+
+            const ctx = document.getElementById(`chart-${symbol}`);
+            if (!ctx) return;
+
+            const color = isProfit ? '#22c55e' : '#ef4444';
+
+            if (sparklineCharts[symbol]) {
+                sparklineCharts[symbol].destroy();
+            }
+
+            sparklineCharts[symbol] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.prices.map((_, i) => i),
+                    datasets: [{
+                        data: data.prices,
+                        borderColor: color,
+                        borderWidth: 1.5,
+                        fill: true,
+                        backgroundColor: color + '15',
+                        tension: 0.1,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+
+        } catch (error) {
+            console.error(`Error loading sparkline for ${symbol}:`, error);
+        }
+    }
+
+    // Load fundamentals for card back
+    async function loadCardFundamentals(symbol) {
+        try {
+            const response = await fetch(`/api/fundamentals/${symbol}`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            // Update dividend on front
+            const divEl = document.getElementById(`div-${symbol}`);
+            if (divEl) {
+                divEl.textContent = data.div_yield ? `${data.div_yield}%` : '-';
+            }
+
+            // Update ratios on back
+            const ratiosEl = document.getElementById(`ratios-${symbol}`);
+            if (ratiosEl) {
+                const deClass = data.de_ratio < 1 ? 'good' : data.de_ratio < 2 ? '' : 'warning';
+                const peClass = data.pe_ratio < data.industry_pe ? 'good' : data.pe_ratio < data.industry_pe * 1.5 ? '' : 'warning';
+                const roeClass = data.roe > 15 ? 'good' : '';
+
+                ratiosEl.innerHTML = `
+                    <div class="ratio-chip ${deClass}"><div class="value">${data.de_ratio.toFixed(2)}</div><div class="label">D/E</div></div>
+                    <div class="ratio-chip ${peClass}"><div class="value">${data.pe_ratio.toFixed(1)}</div><div class="label">P/E</div></div>
+                    <div class="ratio-chip ${roeClass}"><div class="value">${data.roe.toFixed(1)}%</div><div class="label">ROE</div></div>
+                    <div class="ratio-chip"><div class="value">${data.roce.toFixed(1)}%</div><div class="label">ROCE</div></div>
+                `;
+            }
+
+        } catch (error) {
+            console.error(`Error loading fundamentals for ${symbol}:`, error);
+        }
+    }
+
+    // Flip card
+    function flipCard(card) {
+        card.classList.toggle('flipped');
+    }
+
+    // Expand card to modal
+    async function expandCard(symbol, event) {
+        event.stopPropagation();
+        document.getElementById('expandedOverlay').classList.add('active');
+
+        // Find holding data
+        const holding = holdingsData.find(h => h.symbol === symbol);
+        if (!holding) return;
+
+        // Update basic info
+        document.getElementById('exp-logo').textContent = holding.logo;
+        document.getElementById('exp-name').textContent = holding.name || symbol;
+        document.getElementById('exp-symbol').textContent = symbol;
+        document.getElementById('exp-invested').textContent = formatCurrency(holding.invested);
+        document.getElementById('exp-current').textContent = formatCurrency(holding.current);
+
+        const pnlSign = holding.is_profit ? '+' : '';
+        document.getElementById('exp-pnl').textContent = pnlSign + formatCurrency(holding.pnl);
+        document.getElementById('exp-pnl').className = `value ${holding.is_profit ? 'text-success' : 'text-danger'}`;
+        document.getElementById('exp-pnl-pct').textContent = pnlSign + holding.pnl_pct + '%';
+        document.getElementById('exp-pnl-pct').className = `value ${holding.is_profit ? 'text-success' : 'text-danger'}`;
+
+        // Load fundamentals and price data
+        try {
+            const [fundResponse, priceResponse] = await Promise.all([
+                fetch(`/api/fundamentals/${symbol}`),
+                fetch(`/api/historical/${symbol}?period=1y`)
+            ]);
+
+            const fundData = await fundResponse.json();
+            const priceData = await priceResponse.json();
+
+            populateExpandedView(holding, fundData, priceData.prices || []);
+
+        } catch (error) {
+            console.error(`Error loading expanded view for ${symbol}:`, error);
+        }
+    }
+
+    // Populate expanded view with data
+    function populateExpandedView(holding, fundData, prices) {
+        // Update overview
+        document.getElementById('exp-overview').textContent = fundData.description || holding.description || '';
+
+        // Update dividend info
+        document.getElementById('exp-div-yield').textContent = fundData.div_yield ? `${fundData.div_yield}%` : '-';
+        document.getElementById('exp-div-date').textContent = fundData.next_div_date || 'TBA';
+
+        // Update ratios
+        const ratiosHtml = `
+            <div class="exp-ratio"><div class="value">${fundData.de_ratio.toFixed(2)}</div><div class="label">D/E Ratio</div></div>
+            <div class="exp-ratio"><div class="value">${fundData.pe_ratio.toFixed(1)} <span class="text-secondary">/</span> <span class="industry-pe">${fundData.industry_pe.toFixed(1)}</span></div><div class="label">P/E (Stock / Industry)</div></div>
+            <div class="exp-ratio"><div class="value">${fundData.roe.toFixed(1)}%</div><div class="label">ROE</div></div>
+            <div class="exp-ratio"><div class="value">${fundData.roce.toFixed(1)}%</div><div class="label">ROCE</div></div>
+        `;
+        document.getElementById('exp-ratios').innerHTML = ratiosHtml;
+
+        // Destroy existing charts
+        if (expChartInstance) { expChartInstance.destroy(); expChartInstance = null; }
+        if (expRevenueInstance) { expRevenueInstance.destroy(); expRevenueInstance = null; }
+        if (expProfitInstance) { expProfitInstance.destroy(); expProfitInstance = null; }
+        if (expOpmInstance) { expOpmInstance.destroy(); expOpmInstance = null; }
+
+        // Create price chart
+        if (prices.length > 0) {
+            const chartCtx = document.getElementById('exp-chart');
+            const color = holding.is_profit ? '#22c55e' : '#ef4444';
+            expChartInstance = new Chart(chartCtx, {
+                type: 'line',
+                data: {
+                    labels: prices.map((_, i) => i),
+                    datasets: [{
+                        data: prices,
+                        borderColor: color,
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: color + '20',
+                        tension: 0.1,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            display: true,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart labels
+        const chartLabels = ['FY20', 'FY21', 'FY22', 'FY23', 'FY24'];
+
+        // Revenue chart
+        const revCtx = document.getElementById('exp-revenue');
+        expRevenueInstance = new Chart(revCtx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    type: 'bar',
+                    data: fundData.revenue_5y,
+                    backgroundColor: '#3b82f690',
+                    borderRadius: 6,
+                    order: 2
+                }, {
+                    type: 'line',
+                    data: fundData.revenue_5y,
+                    borderColor: '#fbbf24',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#fbbf24',
+                    pointRadius: 3,
+                    tension: 0.3,
+                    fill: false,
+                    order: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: true, grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 8 } } },
+                    y: { display: true, grid: { color: 'rgba(255,255,255,0.08)' }, ticks: { color: '#64748b', font: { size: 8 }, maxTicksLimit: 4 } }
+                }
+            }
+        });
+
+        // Profit chart
+        const profitCtx = document.getElementById('exp-profit');
+        expProfitInstance = new Chart(profitCtx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    type: 'bar',
+                    data: fundData.profit_5y,
+                    backgroundColor: fundData.profit_5y.map(v => v >= 0 ? '#22c55e90' : '#ef444490'),
+                    borderRadius: 6,
+                    order: 2
+                }, {
+                    type: 'line',
+                    data: fundData.profit_5y,
+                    borderColor: '#fbbf24',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#fbbf24',
+                    pointRadius: 3,
+                    tension: 0.3,
+                    fill: false,
+                    order: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: true, grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 8 } } },
+                    y: { display: true, grid: { color: 'rgba(255,255,255,0.08)' }, ticks: { color: '#64748b', font: { size: 8 }, maxTicksLimit: 4 } }
+                }
+            }
+        });
+
+        // OPM chart
+        const opmCtx = document.getElementById('exp-opm');
+        expOpmInstance = new Chart(opmCtx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    type: 'bar',
+                    data: fundData.opm_5y,
+                    backgroundColor: '#f59e0b90',
+                    borderRadius: 6,
+                    order: 2
+                }, {
+                    type: 'line',
+                    data: fundData.opm_5y,
+                    borderColor: '#a78bfa',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#a78bfa',
+                    pointRadius: 3,
+                    tension: 0.3,
+                    fill: false,
+                    order: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: true, grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 8 } } },
+                    y: { display: true, grid: { color: 'rgba(255,255,255,0.08)' }, ticks: { color: '#64748b', font: { size: 8 }, maxTicksLimit: 4, callback: v => v + '%' } }
+                }
+            }
+        });
+    }
+
+    // Close expanded view
+    function closeExpanded(event) {
+        if (event.target === document.getElementById('expandedOverlay') || event.target.closest('.close-btn')) {
+            document.getElementById('expandedOverlay').classList.remove('active');
+        }
+    }
+
+    // Switch view (grid/sector)
+    function switchView(viewType) {
+        document.querySelectorAll('.view-toggle button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === viewType);
+        });
+
+        const gridView = document.getElementById('holdingsGrid');
+        const sectorView = document.getElementById('sector-view');
+
+        if (viewType === 'grid') {
+            gridView.style.display = 'grid';
+            sectorView.style.display = 'none';
+        } else if (viewType === 'sector') {
+            gridView.style.display = 'none';
+            sectorView.style.display = 'block';
+            renderSectorView();
+        }
+    }
+
+    // Render sector view
+    function renderSectorView() {
+        const sectorView = document.getElementById('sector-view');
+
+        // Group by sector
+        const sectors = {};
+        holdingsData.forEach(h => {
+            if (!sectors[h.sector]) {
+                sectors[h.sector] = { stocks: [], invested: 0, current: 0, pnl: 0 };
+            }
+            sectors[h.sector].stocks.push(h);
+            sectors[h.sector].invested += h.invested;
+            sectors[h.sector].current += h.current;
+            sectors[h.sector].pnl += h.pnl;
+        });
+
+        // Build HTML
+        let html = '';
+        for (const [sector, data] of Object.entries(sectors)) {
+            const pnlPct = data.invested > 0 ? (data.pnl / data.invested * 100).toFixed(1) : 0;
+            const isProfit = data.pnl >= 0;
+
+            html += `
+                <div class="sector-group">
+                    <div class="sector-header" onclick="toggleSector(this)">
+                        <div class="sector-name">
+                            <i class="bi bi-collection sector-toggle"></i>
+                            ${sector} <span class="sector-count">${data.stocks.length} stock${data.stocks.length > 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="sector-stats">
+                            <div class="sector-stat"><div class="value">${formatCurrency(data.invested)}</div><div class="label">Invested</div></div>
+                            <div class="sector-stat"><div class="value">${formatCurrency(data.current)}</div><div class="label">Current</div></div>
+                            <div class="sector-stat"><div class="value ${isProfit ? 'text-success' : 'text-danger'}">${isProfit ? '+' : ''}${formatCurrency(data.pnl)}</div><div class="label">P&L</div></div>
+                            <div class="sector-stat"><div class="value ${isProfit ? 'text-success' : 'text-danger'}">${isProfit ? '+' : ''}${pnlPct}%</div><div class="label">Returns</div></div>
+                        </div>
+                    </div>
+                    <div class="sector-content">
+                        <div class="sector-grid">
+                            ${data.stocks.map(h => createCardHtml(h)).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        sectorView.innerHTML = html;
+    }
+
+    // Create card HTML (for sector view)
+    function createCardHtml(h) {
+        const pnlClass = h.is_profit ? 'profit' : 'loss';
+        const pnlSign = h.is_profit ? '+' : '';
+
+        return `
+            <div class="flip-card" data-symbol="${h.symbol}" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="invest-bar" style="--invest-pct: ${h.portfolio_pct}%;"></div>
+                        <div class="card-header-row">
+                            <div class="stock-info">
+                                <div class="stock-logo" onclick="expandCard('${h.symbol}', event)">${h.logo}</div>
+                                <div>
+                                    <div class="stock-name">${h.name || h.symbol}</div>
+                                    <div class="stock-symbol">${h.symbol}</div>
+                                </div>
+                            </div>
+                            <div class="pnl-wrapper">
+                                <span class="pnl-label">P/L %</span>
+                                <div class="pnl-badge ${pnlClass}">${pnlSign}${h.pnl_pct}%</div>
+                            </div>
+                        </div>
+                        <div class="metrics-row">
+                            <div class="metric-item"><div class="value">${formatCurrency(h.invested)}</div><div class="label">Invested</div></div>
+                            <div class="metric-item"><div class="value">${formatCurrency(h.current)}</div><div class="label">Current</div></div>
+                            <div class="metric-item"><div class="value ${h.is_profit ? 'text-success' : 'text-danger'}">${pnlSign}${formatCurrency(h.pnl)}</div><div class="label">P&L</div></div>
+                        </div>
+                        <div class="flip-hint"><i class="bi bi-arrow-repeat"></i> Tap to flip</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="invest-bar" style="--invest-pct: ${h.portfolio_pct}%;"></div>
+                        <div class="back-header">
+                            <span class="back-title">${h.symbol}</span>
+                            <span class="back-close"><i class="bi bi-arrow-repeat"></i></span>
+                        </div>
+                        <p class="text-secondary small">${h.description || 'Loading fundamentals...'}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Toggle sector collapse
+    function toggleSector(header) {
+        header.classList.toggle('collapsed');
+        header.nextElementSibling.classList.toggle('collapsed');
+    }
+
+    // Toggle sort order
+    function toggleSortOrder() {
+        sortAscending = !sortAscending;
+        document.getElementById('sortOrder').innerHTML = `<i class="bi bi-sort-${sortAscending ? 'up' : 'down'}"></i>`;
+        renderHoldingCards();
+    }
+
+    // Sort button handlers
+    document.querySelectorAll('.sort-btn[data-sort]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.sort-btn[data-sort]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentSort = this.dataset.sort;
+            renderHoldingCards();
+        });
+    });
+
+    // Keyboard escape to close expanded
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeExpanded({ target: document.getElementById('expandedOverlay') });
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', loadHoldings);
+</script>
+{% endblock %}
